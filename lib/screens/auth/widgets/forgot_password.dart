@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../../core/constants/app_icons.dart' show AppIcons;
 import '../../../widgets/common/dialog/snackbar_dialog.dart';
 import '../../../widgets/common/button/custom_textbutton.dart';
 import '../../../widgets/common/inputField/custom_textfield.dart';
@@ -74,7 +75,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 Align(
                   alignment: Alignment.center,
                   child: SvgPicture.asset(
-                    'assets/icons/illustrations/ic-password.svg',
+                    AppIcons.forgotPasswordIllustration,
                   ),
                 ),
                 const SizedBox(height: 10),

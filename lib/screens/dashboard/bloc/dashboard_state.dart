@@ -14,6 +14,7 @@ final class DashboardInitial extends DashboardState {}
 final class DashboardLoadingState extends DashboardState {}
 
 final class DashboardDataLoadedState extends DashboardState {
+  final String quote;
   final List<Task> alltasks;
   final List<Task> filteredTasks;
   final FilterModel currentFilters;
@@ -25,13 +26,16 @@ final class DashboardDataLoadedState extends DashboardState {
     required this.filteredTasks,
     required this.currentFilters,
     required this.currentTaskIndex,
+    required this.quote,
     this.highlightedTaskId,
   });
+
   @override
   List<Object?> get props => [
     alltasks,
     filteredTasks,
     currentFilters,
+    quote,
     highlightedTaskId,
     currentTaskIndex,
   ];
@@ -42,8 +46,10 @@ final class DashboardDataLoadedState extends DashboardState {
     FilterModel? currentFilters,
     int? currentTaskIndex,
     String? highlightedTaskId,
+    String? quote,
   }) {
     return DashboardDataLoadedState(
+      quote: quote ?? this.quote,
       alltasks: alltasks ?? this.alltasks,
       filteredTasks: filteredTasks ?? this.filteredTasks,
       currentFilters: currentFilters ?? this.currentFilters,

@@ -13,9 +13,11 @@ class HeaderSection extends StatelessWidget {
   final User? user;
   final List<Task> allTasks;
   final FilterModel currentFilters;
+  final String quote; 
   final VoidCallback showAddTaskDialog;
   const HeaderSection({
     super.key,
+    required this.quote,
     required this.theme,
     required this.controller,
     required this.user,
@@ -35,6 +37,7 @@ class HeaderSection extends StatelessWidget {
           children: [
             const SizedBox(height: 10),
             DbHeader(
+              quote: quote,
               theme: theme,
               controller: controller,
               userFirstName:

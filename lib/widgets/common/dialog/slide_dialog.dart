@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../../core/constants/app_icons.dart';
 import '../../../core/theme/app_pallete.dart';
 
 class SlideDialog extends StatefulWidget {
@@ -200,7 +201,7 @@ class _SlideDialogState extends State<SlideDialog>
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
                                               SvgPicture.asset(
-                                                'assets/icons/common/solid/ic-solar_trash-bin-trash-bold.svg',
+                                                AppIcons.trashBoldIcon,
                                                 color: Colors.red,
                                               ),
                                               const SizedBox(width: 8),

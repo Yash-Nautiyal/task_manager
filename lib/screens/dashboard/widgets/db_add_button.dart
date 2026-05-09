@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:task_app/core/theme/app_pallete.dart';
+import 'package:task_app/widgets/common/button/custom_textbutton.dart';
 
 class DbAddButton extends StatelessWidget {
   final ThemeData theme;
@@ -11,14 +12,10 @@ class DbAddButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      child: TextButton(
-        onPressed: () => onPressed?.call(),
-        style: ButtonStyle(
-          shape: WidgetStateProperty.all(
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          ),
-          backgroundColor: WidgetStateProperty.all(theme.primaryColor),
-        ),
+      child: CustomTextButton(
+        onClick: () => onPressed?.call(),
+        backgroundColor: theme.primaryColor,
+        padding: 1,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

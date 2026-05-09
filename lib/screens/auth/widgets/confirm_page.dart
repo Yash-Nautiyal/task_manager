@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../../../core/constants/app_icons.dart' show AppIcons;
+
 class ConfirmPage extends StatelessWidget {
   const ConfirmPage({super.key});
 
@@ -19,7 +21,7 @@ class ConfirmPage extends StatelessWidget {
             Align(
               alignment: Alignment.center,
               child: SvgPicture.asset(
-                'assets/icons/illustrations/ic-email-inbox.svg',
+                AppIcons.confirmIllustration,
               ),
             ),
             const SizedBox(height: 10),

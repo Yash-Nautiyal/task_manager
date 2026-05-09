@@ -61,7 +61,7 @@ class _AuthPageState extends State<AuthPage> {
             'Signed in successfully.',
             SnackbarType.success,
           );
-          AppRouter.replaceWithDashboard(context);
+          AppRouter.pushDashboardAndRemoveUntil(context);
         }
       },
       child: Form(

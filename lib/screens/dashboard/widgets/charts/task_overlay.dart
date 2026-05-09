@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:task_app/models/task_model.dart';
+import '../../../../core/constants/app_icons.dart';
 import 'calendar_overlay_task_item.dart';
 
 class TaskOverlay extends StatelessWidget {
@@ -79,7 +80,7 @@ class TaskOverlay extends StatelessWidget {
                   child: Row(
                     children: [
                       SvgPicture.asset(
-                        'assets/icons/common/solid/ic-solar-calendar-mark-bold-duotone.svg',
+                        AppIcons.calenderDuoIcon,
                         color: theme.disabledColor,
                       ),
                       const SizedBox(width: 8),

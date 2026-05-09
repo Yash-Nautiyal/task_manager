@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:task_app/widgets/common/appBar/home_appbar.dart';
 import 'package:task_app/widgets/common/dialog/snackbar_dialog.dart';
 import 'package:task_app/widgets/common/loader/custom_loader.dart';
 import '../../../core/helpers/task_helpers.dart' show getSortedTasks;
@@ -163,86 +164,94 @@ class _DashboardViewState extends State<DashboardView>
       child: Scaffold(
         extendBodyBehindAppBar: true,
         resizeToAvoidBottomInset: false,
-        body: Stack(
-          children: [
-            BlocBuilder<DashboardBloc, DashboardState>(
-              buildWhen:
-                  (previous, current) => current is! DashboardListenState,
-              builder: (context, state) {
-                if (state is DashboardLoadingState) {
-                  return Center(child: CustomLoader());
-                }
-                if (state is DashboardDataLoadedState) {
-                  List<Task> sortedTasks = getSortedTasks(state.filteredTasks);
+        appBar: HomeAppBar(theme: theme, dashboardPage: true),
+        body: SafeArea(
+          top: false,
+          child: Stack(
+            children: [
+              BlocBuilder<DashboardBloc, DashboardState>(
+                buildWhen:
+                    (previous, current) => current is! DashboardListenState,
+                builder: (context, state) {
+                  if (state is DashboardLoadingState) {
+                    return Center(child: CustomLoader());
+                  }
+                  if (state is DashboardDataLoadedState) {
+                    Task? priorityTask =
+                        state.filteredTasks.isNotEmpty
+                            ? state.filteredTasks.first
+                            : null;
 
-                  return CustomScrollView(
-                    controller: _scrollController,
-                    slivers: [
-                      // Header Section (Stationary)
-                      HeaderSection(
-                        theme: theme,
-                        controller: _controller,
-                        user: widget.user,
-                        allTasks: state.alltasks,
-                        currentFilters: state.currentFilters,
-                        showAddTaskDialog: _showAddTaskDialog,
-                      ),
-                      // Persistent Tab Bar
-                      SliverPersistentHeader(
-                        pinned: true,
-                        delegate: _SliverAppBarDelegate(
-                          DbTabBar(
-                            theme: theme,
-                            tabController: _tabController,
-                            tabs: tabs,
-                            tabCounts: [2, 2, 2, 2, 2],
-                            onTabSelected: (index) {
-                              context.read<DashboardBloc>().add(
-                                DashboardTabChangedEvent(tabIndex: index as int),
-                              );
-                            },
+                    List<Task> sortedTasks = getSortedTasks(
+                      state.filteredTasks,
+                    );
+
+                    return CustomScrollView(
+                      controller: _scrollController,
+                      slivers: [
+                        // Header Section (Stationary)
+                        HeaderSection(
+                          quote: state.quote,
+                          theme: theme,
+                          controller: _controller,
+                          user: widget.user,
+                          allTasks: state.alltasks,
+                          currentFilters: state.currentFilters,
+                          showAddTaskDialog: _showAddTaskDialog,
+                        ),
+                        // Persistent Tab Bar
+                        SliverPersistentHeader(
+                          pinned: true,
+                          delegate: _SliverAppBarDelegate(
+                            DbTabBar(
+                              theme: theme,
+                              tabController: _tabController,
+                              tabs: tabs,
+                              tabCounts: [2, 2, 2, 2, 2],
+                              onTabSelected: (index) {},
+                            ),
                           ),
                         ),
-                      ),
 
-                      // Tasks Section (Affected by tabs and filters)
-                      TaskSection(
-                        userId: widget.userId,
-                        tabController: _tabController,
-                        scrollController: _scrollController,
-                        theme: theme,
-                        sortedTasks: sortedTasks,
-                        showAllTasks: _showAllTasks,
-                        toggleTaskList: _toggleTaskList,
-                        showAddTaskDialog: _showAddTaskDialog,
-                        expandController: _expandController,
-                      ),
-                      // Charts Section (Stationary)
-                      ChartSection(
-                        theme: theme,
-                        tasks: state.alltasks,
-                        onPageChanged: widget.onPageChanged,
-                      ),
-                    ],
-                  );
-                }
-                return Container();
-              },
-            ),
-            Align(
-              alignment: Alignment.topCenter,
-              child: ConfettiWidget(
-                confettiController: _confettiController,
-                blastDirectionality:
-                    BlastDirectionality.explosive, // random direction
-                shouldLoop: false,
-                emissionFrequency: 0.03,
-                numberOfParticles: 50,
-                maxBlastForce: 20,
-                minBlastForce: 10,
+                        TaskSection(
+                          userId: widget.userId,
+                          tabController: _tabController,
+                          scrollController: _scrollController,
+                          theme: theme,
+                          prioritytask: priorityTask,
+                          sortedTasks: sortedTasks,
+                          showAllTasks: _showAllTasks,
+                          toggleTaskList: _toggleTaskList,
+                          showAddTaskDialog: _showAddTaskDialog,
+                          expandController: _expandController,
+                        ),
+                        // Charts Section (Stationary)
+                        ChartSection(
+                          theme: theme,
+                          tasks: state.alltasks,
+                          onPageChanged: widget.onPageChanged,
+                        ),
+                      ],
+                    );
+                  }
+                  return Container();
+                },
               ),
-            ),
-          ],
+              Align(
+                alignment: Alignment.topCenter,
+                child: ConfettiWidget(
+                  confettiController: _confettiController,
+                  blastDirectionality:
+                      BlastDirectionality.explosive, // random direction
+                  shouldLoop: false,
+                  emissionFrequency: 0.03,
+                  numberOfParticles: 50,
+                  maxBlastForce: 20,
+                  minBlastForce: 10,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

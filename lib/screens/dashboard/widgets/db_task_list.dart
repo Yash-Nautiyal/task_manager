@@ -11,8 +11,6 @@ class DbTaskList extends StatelessWidget {
   final Function onCompleteTask;
   final Function showAddTaskDialog;
   final Function onDeleteTask;
-  final Function onCompleteSubtask;
-  final Function onDeleteSubtask;
   final AnimationController expandController;
   final ScrollController scrollController;
   final ThemeData theme;
@@ -25,9 +23,7 @@ class DbTaskList extends StatelessWidget {
     required this.showAllTasks,
     required this.onDeleteTask,
     required this.onCompleteTask,
-    required this.onDeleteSubtask,
     required this.toggleTaskList,
-    required this.onCompleteSubtask,
     required this.showAddTaskDialog,
     required this.expandController,
   });
@@ -48,15 +44,6 @@ class DbTaskList extends StatelessWidget {
             onCompleteTask: (value) => onCompleteTask(priorityTask.id, value),
             onEdit: () => showAddTaskDialog(priorityTask),
             onDelete: () => onDeleteTask(priorityTask.id),
-            onToggleSubtask:
-                (subtaskId, value) => onCompleteSubtask(
-                  priorityTask.id,
-                  subtaskId,
-                  value,
-                  
-                ),
-            onDeleteSubtask:
-                (subtaskId, taskId) => onDeleteSubtask(subtaskId, taskId),
           ),
         AnimatedSlide(
           offset: Offset(0, showAllTasks ? 0 : 0.1),
@@ -78,16 +65,6 @@ class DbTaskList extends StatelessWidget {
                   return TaskCard(
                     onCompleteTask: (value) => onCompleteTask(task.id, value),
                     task: task,
-                    onToggleSubtask:
-                        (subtaskId, value) =>
-                            onCompleteSubtask(
-                              task.id,
-                              subtaskId,
-                              value,
-                            ),
-                    onDeleteSubtask:
-                        (subtaskId, taskId) =>
-                            onDeleteSubtask(subtaskId, taskId),
                     onEdit: () => showAddTaskDialog(task),
                     onDelete: () => onDeleteTask(task.id),
                   );

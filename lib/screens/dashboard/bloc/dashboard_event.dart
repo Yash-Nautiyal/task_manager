@@ -65,36 +65,6 @@ class DashboardTabChangedEvent extends DashboardEvent {
   List<Object?> get props => [tabIndex];
 }
 
-class DashboardDeleteSubTaskEvent extends DashboardEvent {
-  final String userId;
-  final String taskId;
-  final String subtaskId;
-
-  const DashboardDeleteSubTaskEvent({
-    required this.taskId,
-    required this.subtaskId,
-    required this.userId,
-  });
-  @override
-  List<Object> get props => [taskId, subtaskId, userId];
-}
-
-class DashboardUpdateSubTaskStatusEvent extends DashboardEvent {
-  final String userId;
-  final String taskId;
-  final String subtaskId;
-  final bool isCompleted;
-
-  const DashboardUpdateSubTaskStatusEvent({
-    required this.taskId,
-    required this.subtaskId,
-    required this.userId,
-    required this.isCompleted,
-  });
-  @override
-  List<Object> get props => [taskId, subtaskId, userId, isCompleted];
-}
-
 class DashboardUpdateTaskStatusEvent extends DashboardEvent {
   final String userId;
   final String taskId;
@@ -110,7 +80,4 @@ class DashboardUpdateTaskStatusEvent extends DashboardEvent {
   List<Object> get props => [taskId, isCompleted, userId];
 }
 
-class TaskUpdatedFromDb extends DashboardEvent {
-  final Task task;
-  const TaskUpdatedFromDb(this.task);
-}
+class DashboardFetchQuoteEvent extends DashboardEvent {}

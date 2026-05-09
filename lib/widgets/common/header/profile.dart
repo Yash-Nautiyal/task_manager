@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:task_app/core/routing/app_routes.dart';
+import 'package:task_app/screens/auth/bloc/auth_bloc.dart';
+import 'package:task_app/services/auth_service.dart';
+import 'package:task_app/widgets/common/button/custom_textbutton.dart';
 
 import '../dialog/slide_dialog.dart';
 
@@ -28,8 +33,15 @@ class ProfileDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authState = context.watch<AuthBloc>().state;
+
     String name = '';
     String email = '';
+
+    if (authState is Authenticated) {
+      name = authState.user.displayName ?? '';
+      email = authState.user.email ?? '';
+    }
 
     final initials = _buildInitials(displayName: name, email: email);
 
@@ -91,13 +103,26 @@ class ProfileDialog extends StatelessWidget {
             ),
           ),
           const Spacer(),
-          Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(),
-              child: Text('Logout'),
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: CustomTextButton(
+                  backgroundColor: theme.colorScheme.error.withValues(
+                    alpha: 0.3,
+                  ),
+                  onClick: () async {
+                    await AuthService().signOut();
+                    if (context.mounted) {
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                        AppRoutes.home,
+                        (route) => false,
+                      );
+                    }
+                  },
+                  child: Text('Logout'),
+                ),
+              ),
+            ],
           ),
         ],
       ),

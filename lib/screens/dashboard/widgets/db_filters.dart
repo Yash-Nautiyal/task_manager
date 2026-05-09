@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:task_app/models/task_model.dart';
 import 'package:task_app/widgets/common/inputField/custom_textfield.dart';
 
+import '../../../core/constants/app_icons.dart' show AppIcons;
 import '../../../models/filter_model.dart';
 
 class DbFilters extends StatefulWidget {
@@ -174,7 +175,7 @@ class _DbFiltersState extends State<DbFilters> with TickerProviderStateMixin {
           mainAxisSize: MainAxisSize.min, // Changed from max to min
           children: [
             SvgPicture.asset(
-              'assets/icons/common/solid/ic-solar-calendar-mark-bold-duotone.svg',
+              AppIcons.calenderDuoIcon,
               color: widget.theme.disabledColor,
               width: 20,
             ),
@@ -235,8 +236,11 @@ class _DbFiltersState extends State<DbFilters> with TickerProviderStateMixin {
                       key: const ValueKey('search-icon'),
                       onPressed: _toggleSearch,
                       icon: SvgPicture.asset(
-                        'assets/icons/ic-eva_search-fill.svg',
-                        color: widget.theme.disabledColor,
+                        AppIcons.searchFillIcon,
+                        colorFilter: ColorFilter.mode(
+                          widget.theme.disabledColor,
+                          BlendMode.srcIn,
+                        ),
                       ),
                     ),
           ),
@@ -262,7 +266,7 @@ class _DbFiltersState extends State<DbFilters> with TickerProviderStateMixin {
                       key: const ValueKey('date-icon'),
                       onPressed: _toggleDate,
                       icon: SvgPicture.asset(
-                        'assets/icons/ic-calender.svg',
+                        AppIcons.calendarIcon,
                         // ignore: deprecated_member_use
                         color: widget.theme.disabledColor,
                       ),
@@ -285,18 +289,22 @@ class _DbFiltersState extends State<DbFilters> with TickerProviderStateMixin {
                         key: const ValueKey('list-icon'),
                         onPressed: widget.onGridToggled?.call,
                         icon: SvgPicture.asset(
-                          'assets/icons/common/solid/ic-solar-list.svg',
-                          // ignore: deprecated_member_use
-                          color: widget.theme.disabledColor,
+                          AppIcons.listBoldIcon,
+                          colorFilter: ColorFilter.mode(
+                            widget.theme.disabledColor,
+                            BlendMode.srcIn,
+                          ),
                         ),
                       )
                       : IconButton(
                         key: const ValueKey('grid-icon'),
                         onPressed: widget.onGridToggled?.call,
                         icon: SvgPicture.asset(
-                          'assets/icons/common/solid/ic-solar-widget.svg',
-                          // ignore: deprecated_member_use
-                          color: widget.theme.disabledColor,
+                          AppIcons.widgetBoldIcon,
+                          colorFilter: ColorFilter.mode(
+                            widget.theme.disabledColor,
+                            BlendMode.srcIn,
+                          ),
                         ),
                       ),
             ),

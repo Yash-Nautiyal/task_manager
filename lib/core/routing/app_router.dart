@@ -25,14 +25,14 @@ abstract final class AppRouter {
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
       case AppRoutes.home:
+        if (_isAuthenticated) {
+          return _buildDashboardRoute(settings);
+        }
         return MaterialPageRoute<void>(
           builder: (_) => const HomeView(),
           settings: settings,
         );
       case AppRoutes.auth:
-        if (_isAuthenticated) {
-          return _buildDashboardRoute(settings);
-        }
         return MaterialPageRoute<void>(
           builder: (_) => const AuthView(),
           settings: settings,
@@ -89,6 +89,19 @@ abstract final class AppRouter {
       ).pushReplacementNamed<T, T>(AppRoutes.dashboard);
     }
     return Navigator.of(context).pushReplacementNamed<T, T>(AppRoutes.auth);
+  }
+
+  static Future<T?> pushDashboardAndRemoveUntil<T extends Object?>(
+    BuildContext context,
+  ) {
+    if (_isAuthenticated) {
+      return Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil<T>(AppRoutes.dashboard, (route) => false);
+    }
+    return Navigator.of(
+      context,
+    ).pushNamedAndRemoveUntil<T>(AppRoutes.auth, (route) => false);
   }
 
   static Future<T?> pushSignup<T extends Object?>(BuildContext context) =>

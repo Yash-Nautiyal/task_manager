@@ -3,6 +3,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:task_app/core/theme/app_pallete.dart';
 import 'package:task_app/models/task_model.dart';
 
+import '../../../../core/constants/app_icons.dart';
+
 class CalendarOverlayTaskItem extends StatelessWidget {
   final Task task;
   final ThemeData theme;
@@ -49,7 +51,10 @@ class CalendarOverlayTaskItem extends StatelessWidget {
             decoration: BoxDecoration(
               color: theme.colorScheme.surface,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: statusColor.withValues(alpha: 0.3), width: 1),
+              border: Border.all(
+                color: statusColor.withValues(alpha: 0.3),
+                width: 1,
+              ),
               boxShadow: [
                 BoxShadow(
                   color: statusColor.withValues(alpha: 0.1),
@@ -81,7 +86,9 @@ class CalendarOverlayTaskItem extends StatelessWidget {
                         Text(
                           task.description,
                           style: theme.textTheme.bodySmall!.copyWith(
-                            color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                            color: theme.colorScheme.onSurface.withValues(
+                              alpha: 0.7,
+                            ),
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -115,7 +122,7 @@ class CalendarOverlayTaskItem extends StatelessWidget {
         IconButton(
           onPressed: () => onTaskSelected.call(1, task.id),
           icon: SvgPicture.asset(
-            'assets/icons/arrow/ic-redirect.svg',
+            AppIcons.redirectIcon,
             width: 20,
             color: AppPallete.infoMain,
           ),

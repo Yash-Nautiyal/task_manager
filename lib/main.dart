@@ -39,11 +39,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final isAuthenticated = AuthService().currentUser != null;
 
+    debugPrint('User is authenticated: $isAuthenticated');
+
     return MaterialApp(
       title: 'Sankar Task Manager',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      initialRoute: isAuthenticated ? AppRoutes.dashboard : AppRoutes.home,
+      initialRoute: AppRoutes.home,
       onGenerateRoute: AppRouter.onGenerateRoute,
     );
   }

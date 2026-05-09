@@ -3,24 +3,21 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:task_app/core/theme/app_pallete.dart';
 import 'package:task_app/models/task_model.dart';
 
+import '../../../core/constants/app_icons.dart' show AppIcons;
 import '../../../core/helpers/task_helpers.dart';
 import 'dialogs/delete_dialog.dart';
 
 class TaskCard extends StatefulWidget {
   final Task task;
   final Function onCompleteTask;
-  final Function onToggleSubtask;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
   final bool isHighlighted;
-  final Function onDeleteSubtask;
   final bool grid;
 
   const TaskCard({
     super.key,
     required this.task,
-    required this.onDeleteSubtask,
-    required this.onToggleSubtask,
     required this.onCompleteTask,
     required this.onEdit,
     required this.onDelete,
@@ -221,7 +218,7 @@ class _TaskCardState extends State<TaskCard>
                             child: Row(
                               children: [
                                 SvgPicture.asset(
-                                  'assets/icons/arrow/ic-solid-check-one.svg',
+                                  AppIcons.checkRoundedIcon,
                                   colorFilter: ColorFilter.mode(
                                     AppPallete.successMain,
                                     BlendMode.srcIn,
@@ -256,7 +253,7 @@ class _TaskCardState extends State<TaskCard>
                           child: Row(
                             children: [
                               SvgPicture.asset(
-                                'assets/icons/ic-calender.svg',
+                                AppIcons.calendarIcon,
                                 color: theme.dividerColor,
                               ),
                               const SizedBox(width: 6),
@@ -276,7 +273,7 @@ class _TaskCardState extends State<TaskCard>
                     if (widget.task.status != TaskStatus.completed)
                       IconButton(
                         icon: SvgPicture.asset(
-                          'assets/icons/common/solid/ic-solar_pen-bold.svg',
+                          AppIcons.penBoldIcon,
                           colorFilter: ColorFilter.mode(
                             theme.colorScheme.primaryContainer,
                             BlendMode.srcIn,
@@ -288,7 +285,7 @@ class _TaskCardState extends State<TaskCard>
                     if (widget.task.status != TaskStatus.completed)
                       IconButton(
                         icon: SvgPicture.asset(
-                          'assets/icons/common/solid/ic-solar_trash-bin-trash-bold.svg',
+                          AppIcons.trashBoldIcon,
                           colorFilter: ColorFilter.mode(
                             theme.colorScheme.error,
                             BlendMode.srcIn,

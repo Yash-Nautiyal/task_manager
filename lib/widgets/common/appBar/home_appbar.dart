@@ -1,8 +1,11 @@
 import 'dart:ui';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:task_app/core/routing/app_router.dart';
+
+import '../../../core/constants/app_icons.dart';
 
 class HomeAppBar extends StatefulWidget implements PreferredSizeWidget {
   final ThemeData theme;
@@ -36,14 +39,37 @@ class _HomeAppBarState extends State<HomeAppBar> with TickerProviderStateMixin {
     vsync: this,
   )..repeat();
 
+  late User? user;
   final Tween<double> turnsTween = Tween<double>(begin: 0, end: 1);
 
   String _extractInitials() {
+    final displayName = user?.displayName ?? '';
+    final email = user?.email ?? '';
+    final display = displayName.trim();
+    if (display.isNotEmpty) {
+      final parts = display.split(RegExp(r'\s+')).where((p) => p.isNotEmpty);
+      final list = parts.toList();
+      if (list.length >= 2) {
+        return '${list.first[0]}${list.last[0]}'.toUpperCase();
+      }
+      return list.first[0].toUpperCase();
+    }
+    final safeEmail = email.trim();
+    if (safeEmail.isNotEmpty) {
+      return safeEmail[0].toUpperCase();
+    }
     return 'U';
   }
 
   @override
   void initState() {
+    user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      debugPrint('User display name: ${user!.displayName}');
+      debugPrint('User email: ${user!.email}');
+    } else {
+      debugPrint('No user is currently signed in.');
+    }
     super.initState();
   }
 
@@ -58,7 +84,7 @@ class _HomeAppBarState extends State<HomeAppBar> with TickerProviderStateMixin {
     return AppBar(
       leadingWidth: widget.landingPage || widget.dashboardPage ? 90 : null,
       leading:
-          widget.signinPage
+          Navigator.canPop(context)
               ? IconButton(
                 icon: Icon(
                   Icons.arrow_back,
@@ -77,13 +103,15 @@ class _HomeAppBarState extends State<HomeAppBar> with TickerProviderStateMixin {
           filter: ImageFilter.blur(sigmaX: 7, sigmaY: 7),
           child: Container(
             decoration: BoxDecoration(
-              color: widget.theme.scaffoldBackgroundColor.withOpacity(0.9),
+              color: widget.theme.scaffoldBackgroundColor.withValues(
+                alpha: 0.9,
+              ),
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  widget.theme.scaffoldBackgroundColor.withOpacity(.9),
-                  widget.theme.scaffoldBackgroundColor.withOpacity(.4),
+                  widget.theme.scaffoldBackgroundColor.withValues(alpha: 0.9),
+                  widget.theme.scaffoldBackgroundColor.withValues(alpha: 0.4),
                 ],
               ),
             ),
@@ -96,7 +124,7 @@ class _HomeAppBarState extends State<HomeAppBar> with TickerProviderStateMixin {
           IconButton(
             onPressed: () => widget.onPageChanged?.call(0, null),
             icon: SvgPicture.asset(
-              'assets/icons/nav/ic-home.svg',
+              AppIcons.homeIcon,
               colorFilter: ColorFilter.mode(
                 widget.currentIndex == 0
                     ? widget.theme.colorScheme.primaryContainer
@@ -110,7 +138,7 @@ class _HomeAppBarState extends State<HomeAppBar> with TickerProviderStateMixin {
           IconButton(
             onPressed: () => widget.onPageChanged?.call(1, null),
             icon: SvgPicture.asset(
-              'assets/icons/nav/ic-list-bold-duotone.svg',
+              AppIcons.listBoldDuotoneIcon,
               colorFilter: ColorFilter.mode(
                 widget.currentIndex == 1
                     ? widget.theme.colorScheme.primaryContainer
@@ -127,7 +155,7 @@ class _HomeAppBarState extends State<HomeAppBar> with TickerProviderStateMixin {
           icon: RotationTransition(
             turns: turnsTween.animate(_controller),
             child: SvgPicture.asset(
-              'assets/icons/ic-settings.svg',
+              AppIcons.settingIcon,
               colorFilter: ColorFilter.mode(
                 widget.theme.disabledColor,
                 BlendMode.srcIn,

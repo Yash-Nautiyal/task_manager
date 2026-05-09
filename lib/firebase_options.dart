@@ -65,4 +65,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'task-app-88fdb.firebasestorage.app',
     iosBundleId: 'com.yashnautiyal.taskapp',
   );
+
 }

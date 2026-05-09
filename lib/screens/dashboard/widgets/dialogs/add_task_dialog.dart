@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:task_app/models/task_model.dart';
 import 'package:task_app/widgets/common/inputField/custom_textfield.dart';
 
+import '../../../../core/constants/app_icons.dart';
 import 'footer_buttons.dart';
 
 class AddTaskDialog extends StatefulWidget {
@@ -231,7 +232,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                             ),
                             const SizedBox(width: 8),
                             SvgPicture.asset(
-                              "assets/icons/ic-calender.svg",
+                              AppIcons.calendarIcon,
                               color: theme.disabledColor,
                             ),
                           ],

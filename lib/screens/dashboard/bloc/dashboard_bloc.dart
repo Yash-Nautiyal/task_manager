@@ -2,18 +2,21 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:task_app/core/error/failures.dart';
+import 'package:task_app/core/error/failures.dart'; // Make sure this matches your exception file
 import 'package:task_app/core/helpers/task_helpers.dart';
 import 'package:task_app/services/firestore_service.dart';
+import 'package:task_app/services/api_service.dart'; // Added API Service
 
 import '../../../models/filter_model.dart';
 import '../../../models/task_model.dart';
+
 part 'dashboard_event.dart';
 part 'dashboard_state.dart';
 
 class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
-  DashboardBloc({FirestoreService? firestoreService})
+  DashboardBloc({FirestoreService? firestoreService, ApiService? apiService})
     : _firestoreService = firestoreService ?? FirestoreService(),
+      _apiService = apiService ?? ApiService(),
       super(DashboardInitial()) {
     on<DashboardLoadTasksEvent>(_onLoadTasks);
     on<DashboardAddTaskEvent>(_onAddTask);
@@ -24,10 +27,15 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     on<DashboardTabChangedEvent>(_onTabChanged);
     on<DashboardUpdateTaskStatusEvent>(_onUpdateTaskStatus);
     on<_DashboardTasksChanged>(_onTasksChanged);
+    on<DashboardFetchQuoteEvent>(_onFetchQuote); // Registered Quote Event
   }
 
   final FirestoreService _firestoreService;
+  final ApiService _apiService;
   StreamSubscription<List<Task>>? _tasksSubscription;
+
+  // Local cache for the quote so it persists across task stream updates
+  String _currentQuote = '"Keep pushing forward." - Unknown';
 
   List<Task> _buildFilteredTasks({
     required List<Task> allTasks,
@@ -43,11 +51,14 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     Emitter<DashboardState> emit,
   ) async {
     emit(DashboardLoadingState());
+
+    add(DashboardFetchQuoteEvent());
+
     await _tasksSubscription?.cancel();
     try {
-      _tasksSubscription = _firestoreService.getTasksStream(event.userId).listen(
-        (tasks) => add(_DashboardTasksChanged(tasks)),
-      );
+      _tasksSubscription = _firestoreService
+          .getTasksStream(event.userId)
+          .listen((tasks) => add(_DashboardTasksChanged(tasks)));
     } on AppFailure catch (e) {
       emit(DashboardDataErrorState(error: e.message));
     } catch (_) {
@@ -59,13 +70,33 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     }
   }
 
+  Future<void> _onFetchQuote(
+    DashboardFetchQuoteEvent event,
+    Emitter<DashboardState> emit,
+  ) async {
+    try {
+      final response = await _apiService.fetchRandomQuote();
+      if (response.isSuccess) {
+        _currentQuote = response.data!;
+      }
+      if (state is DashboardDataLoadedState) {
+        final currentState = state as DashboardDataLoadedState;
+        emit(currentState.copyWith(quote: _currentQuote));
+      }
+    } catch (_) {
+      // If the API fails, silently ignore it. The UI will just use the default _currentQuote.
+    }
+  }
+
   Future<void> _onAddTask(
     DashboardAddTaskEvent event,
     Emitter<DashboardState> emit,
   ) async {
     try {
       await _firestoreService.addTask(event.task);
-      emit(DashboardDataSucssfulState(successMessage: 'Task added successfully.'));
+      emit(
+        DashboardDataSucssfulState(successMessage: 'Task added successfully.'),
+      );
     } on AppFailure catch (e) {
       emit(DashboardDataErrorState(error: e.message));
     } catch (_) {
@@ -84,7 +115,9 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     try {
       await _firestoreService.editTask(event.task);
       emit(
-        DashboardDataSucssfulState(successMessage: 'Task updated successfully.'),
+        DashboardDataSucssfulState(
+          successMessage: 'Task updated successfully.',
+        ),
       );
     } on AppFailure catch (e) {
       emit(DashboardDataErrorState(error: e.message));
@@ -104,7 +137,9 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     try {
       await _firestoreService.deleteTask(event.taskId);
       emit(
-        DashboardDataSucssfulState(successMessage: 'Task deleted successfully.'),
+        DashboardDataSucssfulState(
+          successMessage: 'Task deleted successfully.',
+        ),
       );
     } on AppFailure catch (e) {
       emit(DashboardDataErrorState(error: e.message));
@@ -214,7 +249,11 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
         tabIndex: currentState.currentTaskIndex,
       );
       emit(
-        currentState.copyWith(alltasks: event.tasks, filteredTasks: filteredTasks),
+        currentState.copyWith(
+          alltasks: event.tasks,
+          filteredTasks: filteredTasks,
+          quote: _currentQuote, // Ensure the quote persists when tasks update
+        ),
       );
       return;
     }
@@ -232,6 +271,7 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
         filteredTasks: filteredTasks,
         currentFilters: defaultFilters,
         currentTaskIndex: defaultTab,
+        quote: _currentQuote, // Inject the quote on initial stream load
       ),
     );
   }

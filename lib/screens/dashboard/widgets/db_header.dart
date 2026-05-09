@@ -7,11 +7,13 @@ class DbHeader extends StatelessWidget {
   final ThemeData theme;
   final Animation<double> controller;
   final String userFirstName;
+  final String quote;
   const DbHeader({
     super.key,
     required this.theme,
     required this.controller,
     required this.userFirstName,
+    required this.quote,
   });
 
   @override
@@ -20,34 +22,25 @@ class DbHeader extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text('🙏', style: theme.textTheme.displayLarge?.copyWith(fontSize: 50)),
-        const SizedBox(height: 10),
-        Wrap(
-          alignment: WrapAlignment.center,
-          spacing: 5,
-          children: [
-            Text('Namaste', style: theme.textTheme.displayMedium),
-            AnimatedGradientText(
-              text:
-                  userFirstName.isNotEmpty
-                      ? '${userFirstName[0].toUpperCase()}${userFirstName.substring(1)}'
-                      : '',
-              colors: const [
-                AppPallete.secondaryLight,
-                AppPallete.infoMain,
-                AppPallete.infoMain,
-                AppPallete.secondaryLight,
-                AppPallete.infoMain,
-              ],
-              animation: controller,
-              style: theme.textTheme.displayMedium,
-            ),
+        AnimatedGradientText(
+          text: 'Hello, $userFirstName!',
+          style: theme.textTheme.headlineMedium?.copyWith(
+            color: AppPallete.white,
+            fontWeight: FontWeight.bold,
+          ),
+          animation: controller,
+          colors: [
+            AppPallete.warningMain,
+            AppPallete.primaryMain,
+            AppPallete.infoMain,
           ],
         ),
+        const SizedBox(height: 10),
         Text(
-          'What are we ticking off today?',
-          style: theme.textTheme.titleMedium?.copyWith(
-            color: theme.disabledColor,
+          quote,
+          textAlign: TextAlign.center,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            fontStyle: FontStyle.italic,
           ),
         ),
       ],
