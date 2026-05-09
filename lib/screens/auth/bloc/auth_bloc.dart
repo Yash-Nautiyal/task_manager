@@ -61,7 +61,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       password: event.password,
     );
     if (!result.isSuccess) {
-      emit(AuthError(result.errorMessage!));
+      emit(AuthError(result.failure!.message));
       emit(Unauthenticated());
       return;
     }
@@ -84,7 +84,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       displayName: displayName.isEmpty ? null : displayName,
     );
     if (!result.isSuccess) {
-      emit(AuthError(result.errorMessage!));
+      emit(AuthError(result.failure!.message));
       emit(Unauthenticated());
       return;
     }
@@ -97,7 +97,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     final result = await _authService.signOut();
     if (!result.isSuccess) {
-      emit(AuthError(result.errorMessage!));
+      emit(AuthError(result.failure!.message));
       final user = _authService.currentUser;
       if (user != null) {
         emit(Authenticated(user));
@@ -116,7 +116,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     final result = await _authService.sendPasswordResetEmail(event.email);
     if (!result.isSuccess) {
-      emit(AuthError(result.errorMessage!));
+      emit(AuthError(result.failure!.message));
       emit(Unauthenticated());
       return;
     }

@@ -1,19 +1,28 @@
 part of 'dashboard_bloc.dart';
 
-sealed class DashboardState extends Equatable {
-  const DashboardState();
+enum DashboardStatus { initial, loading, loaded, error }
+
+enum UIActionType { success, error, confetti }
+
+class DashboardInitial extends DashboardState {}
+
+class DashboardUIAction extends Equatable {
+  final UIActionType type;
+  final String? message;
+  final int _timestamp;
+
+  DashboardUIAction({required this.type, this.message})
+    : _timestamp = DateTime.now().millisecondsSinceEpoch;
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [type, message, _timestamp];
 }
 
-sealed class DashboardListenState extends DashboardState {}
+class DashboardState extends Equatable {
+  final DashboardStatus status;
+  final DashboardUIAction? uiAction;
+  final String? globalError;
 
-final class DashboardInitial extends DashboardState {}
-
-final class DashboardLoadingState extends DashboardState {}
-
-final class DashboardDataLoadedState extends DashboardState {
   final String quote;
   final List<Task> alltasks;
   final List<Task> filteredTasks;
@@ -21,34 +30,46 @@ final class DashboardDataLoadedState extends DashboardState {
   final String? highlightedTaskId;
   final int currentTaskIndex;
 
-  const DashboardDataLoadedState({
-    required this.alltasks,
-    required this.filteredTasks,
-    required this.currentFilters,
-    required this.currentTaskIndex,
-    required this.quote,
+  const DashboardState({
+    this.status = DashboardStatus.initial,
+    this.uiAction,
+    this.globalError,
+    this.quote = '"Keep pushing forward." - Unknown',
+    this.alltasks = const [],
+    this.filteredTasks = const [],
+    this.currentFilters = const FilterModel(),
+    this.currentTaskIndex = 0,
     this.highlightedTaskId,
   });
 
   @override
   List<Object?> get props => [
+    status,
+    uiAction,
+    globalError,
+    quote,
     alltasks,
     filteredTasks,
     currentFilters,
-    quote,
     highlightedTaskId,
     currentTaskIndex,
   ];
 
-  DashboardDataLoadedState copyWith({
+  DashboardState copyWith({
+    DashboardStatus? status,
+    DashboardUIAction? uiAction,
+    String? globalError,
+    String? quote,
     List<Task>? alltasks,
     List<Task>? filteredTasks,
     FilterModel? currentFilters,
     int? currentTaskIndex,
     String? highlightedTaskId,
-    String? quote,
   }) {
-    return DashboardDataLoadedState(
+    return DashboardState(
+      status: status ?? this.status,
+      uiAction: uiAction,
+      globalError: globalError ?? this.globalError,
       quote: quote ?? this.quote,
       alltasks: alltasks ?? this.alltasks,
       filteredTasks: filteredTasks ?? this.filteredTasks,
@@ -58,20 +79,3 @@ final class DashboardDataLoadedState extends DashboardState {
     );
   }
 }
-
-class DashboardDataErrorState extends DashboardListenState {
-  final String error;
-
-  DashboardDataErrorState({required this.error});
-  @override
-  List<Object> get props => [error];
-}
-
-class DashboardDataSucssfulState extends DashboardListenState {
-  final String successMessage;
-  DashboardDataSucssfulState({required this.successMessage});
-  @override
-  List<Object> get props => [successMessage];
-}
-
-class DashboardTaskCompletedState extends DashboardListenState {}

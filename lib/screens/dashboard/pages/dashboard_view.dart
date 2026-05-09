@@ -5,7 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_app/widgets/common/appBar/home_appbar.dart';
 import 'package:task_app/widgets/common/dialog/snackbar_dialog.dart';
 import 'package:task_app/widgets/common/loader/custom_loader.dart';
-import '../../../core/helpers/task_helpers.dart' show getSortedTasks;
+import '../../../core/helpers/task_helpers.dart'
+    show applyFilters, getSortedTasks;
 import '../../../models/task_model.dart';
 import '../bloc/dashboard_bloc.dart';
 import '../widgets/db_tab_bar.dart';
@@ -101,7 +102,7 @@ class _DashboardViewState extends State<DashboardView>
 
     final blocState = context.read<DashboardBloc>().state;
     int initialTabIndex = 0;
-    if (blocState is DashboardDataLoadedState) {
+    if (blocState.status == DashboardStatus.loaded) {
       initialTabIndex = blocState.currentTaskIndex;
     }
     _tabController = TabController(
@@ -145,20 +146,25 @@ class _DashboardViewState extends State<DashboardView>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return BlocListener<DashboardBloc, DashboardState>(
-      listenWhen: (previous, current) => current is DashboardListenState,
+      listenWhen:
+          (previous, current) =>
+              current.uiAction != null && previous.uiAction != current.uiAction,
       listener: (context, state) {
-        if (state is DashboardDataErrorState) {
-          showAnimatedSnackbar(context, state.error, SnackbarType.error);
-        }
-        if (state is DashboardTaskCompletedState) {
-          _triggerConfetti();
-        }
-        if (state is DashboardDataSucssfulState) {
+        final action = state.uiAction!;
+        if (action.type == UIActionType.error) {
           showAnimatedSnackbar(
             context,
-            state.successMessage,
+            action.message ?? 'Error',
+            SnackbarType.error,
+          );
+        } else if (action.type == UIActionType.success) {
+          showAnimatedSnackbar(
+            context,
+            action.message ?? 'Success',
             SnackbarType.success,
           );
+        } else if (action.type == UIActionType.confetti) {
+          _triggerConfetti();
         }
       },
       child: Scaffold(
@@ -171,12 +177,21 @@ class _DashboardViewState extends State<DashboardView>
             children: [
               BlocBuilder<DashboardBloc, DashboardState>(
                 buildWhen:
-                    (previous, current) => current is! DashboardListenState,
+                    (previous, current) =>
+                        previous.status != current.status ||
+                        previous.alltasks != current.alltasks ||
+                        previous.currentTaskIndex != current.currentTaskIndex,
                 builder: (context, state) {
-                  if (state is DashboardLoadingState) {
-                    return Center(child: CustomLoader());
+                  if (state.status == DashboardStatus.loading ||
+                      state.status == DashboardStatus.initial) {
+                    return const Center(child: CustomLoader());
                   }
-                  if (state is DashboardDataLoadedState) {
+                  if (state.status == DashboardStatus.error) {
+                    return Center(
+                      child: Text(state.globalError ?? 'An error occurred.'),
+                    );
+                  }
+                  if (state.status == DashboardStatus.loaded) {
                     Task? priorityTask =
                         state.filteredTasks.isNotEmpty
                             ? state.filteredTasks.first
@@ -184,6 +199,15 @@ class _DashboardViewState extends State<DashboardView>
 
                     List<Task> sortedTasks = getSortedTasks(
                       state.filteredTasks,
+                    );
+                    final tabCounts = List<int>.generate(
+                      tabs.length,
+                      (index) =>
+                          applyFilters(
+                            state.alltasks,
+                            state.currentFilters,
+                            tabIndex: index,
+                          ).length,
                     );
 
                     return CustomScrollView(
@@ -207,23 +231,43 @@ class _DashboardViewState extends State<DashboardView>
                               theme: theme,
                               tabController: _tabController,
                               tabs: tabs,
-                              tabCounts: [2, 2, 2, 2, 2],
-                              onTabSelected: (index) {},
+                              tabCounts: tabCounts,
+                              onTabSelected: (index) {
+                                context.read<DashboardBloc>().add(
+                                  DashboardTabChangedEvent(tabIndex: index),
+                                );
+                                if (_showAllTasks) {
+                                  _expandController.reverse().then((_) {
+                                    setState(() {
+                                      _showAllTasks = false;
+                                    });
+                                  });
+                                }
+                              },
                             ),
                           ),
                         ),
 
                         TaskSection(
+                          theme: theme,
                           userId: widget.userId,
                           tabController: _tabController,
                           scrollController: _scrollController,
-                          theme: theme,
                           prioritytask: priorityTask,
                           sortedTasks: sortedTasks,
                           showAllTasks: _showAllTasks,
                           toggleTaskList: _toggleTaskList,
                           showAddTaskDialog: _showAddTaskDialog,
                           expandController: _expandController,
+                          completeTask: (taskId, value) {
+                            context.read<DashboardBloc>().add(
+                              DashboardUpdateTaskStatusEvent(
+                                userId: widget.userId,
+                                taskId: taskId,
+                                isCompleted: value,
+                              ),
+                            );
+                          },
                         ),
                         // Charts Section (Stationary)
                         ChartSection(

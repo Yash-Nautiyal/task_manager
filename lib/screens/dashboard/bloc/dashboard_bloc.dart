@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:task_app/core/error/failures.dart'; // Make sure this matches your exception file
 import 'package:task_app/core/helpers/task_helpers.dart';
+import 'package:task_app/core/utils/result.dart';
 import 'package:task_app/services/firestore_service.dart';
 import 'package:task_app/services/api_service.dart'; // Added API Service
 
@@ -27,14 +29,13 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     on<DashboardTabChangedEvent>(_onTabChanged);
     on<DashboardUpdateTaskStatusEvent>(_onUpdateTaskStatus);
     on<_DashboardTasksChanged>(_onTasksChanged);
-    on<DashboardFetchQuoteEvent>(_onFetchQuote); // Registered Quote Event
+    on<DashboardFetchQuoteEvent>(_onFetchQuote);
   }
 
   final FirestoreService _firestoreService;
   final ApiService _apiService;
   StreamSubscription<List<Task>>? _tasksSubscription;
 
-  // Local cache for the quote so it persists across task stream updates
   String _currentQuote = '"Keep pushing forward." - Unknown';
 
   List<Task> _buildFilteredTasks({
@@ -50,8 +51,7 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     DashboardLoadTasksEvent event,
     Emitter<DashboardState> emit,
   ) async {
-    emit(DashboardLoadingState());
-
+    emit(state.copyWith(status: DashboardStatus.loading));
     add(DashboardFetchQuoteEvent());
 
     await _tasksSubscription?.cancel();
@@ -59,15 +59,31 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
       _tasksSubscription = _firestoreService
           .getTasksStream(event.userId)
           .listen((tasks) => add(_DashboardTasksChanged(tasks)));
-    } on AppFailure catch (e) {
-      emit(DashboardDataErrorState(error: e.message));
     } catch (_) {
       emit(
-        DashboardDataErrorState(
-          error: 'Failed to load tasks. Please check your connection.',
+        state.copyWith(
+          status: DashboardStatus.error,
+          globalError: 'Failed to load tasks. Please check your connection.',
         ),
       );
     }
+  }
+
+  void _onTasksChanged(
+    _DashboardTasksChanged event,
+    Emitter<DashboardState> emit,
+  ) {
+    emit(
+      state.copyWith(
+        status: DashboardStatus.loaded,
+        alltasks: event.tasks,
+        filteredTasks: _buildFilteredTasks(
+          allTasks: event.tasks,
+          filters: state.currentFilters,
+          tabIndex: state.currentTaskIndex,
+        ),
+      ),
+    );
   }
 
   Future<void> _onFetchQuote(
@@ -79,12 +95,10 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
       if (response.isSuccess) {
         _currentQuote = response.data!;
       }
-      if (state is DashboardDataLoadedState) {
-        final currentState = state as DashboardDataLoadedState;
-        emit(currentState.copyWith(quote: _currentQuote));
-      }
-    } catch (_) {
+      emit(state.copyWith(quote: _currentQuote));
+    } on AppFailure catch (e) {
       // If the API fails, silently ignore it. The UI will just use the default _currentQuote.
+      debugPrint('Failed to fetch quote: $e');
     }
   }
 
@@ -92,17 +106,23 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     DashboardAddTaskEvent event,
     Emitter<DashboardState> emit,
   ) async {
-    try {
-      await _firestoreService.addTask(event.task);
+    final result = await _firestoreService.addTask(event.task);
+    if (result.isSuccess) {
       emit(
-        DashboardDataSucssfulState(successMessage: 'Task added successfully.'),
+        state.copyWith(
+          uiAction: DashboardUIAction(
+            type: UIActionType.success,
+            message: 'Task added successfully.',
+          ),
+        ),
       );
-    } on AppFailure catch (e) {
-      emit(DashboardDataErrorState(error: e.message));
-    } catch (_) {
+    } else {
       emit(
-        DashboardDataErrorState(
-          error: 'Failed to add task. Please check your connection.',
+        state.copyWith(
+          uiAction: DashboardUIAction(
+            type: UIActionType.error,
+            message: result.failure!.message,
+          ),
         ),
       );
     }
@@ -112,19 +132,39 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     DashboardUpdateTaskEvent event,
     Emitter<DashboardState> emit,
   ) async {
-    try {
-      await _firestoreService.editTask(event.task);
+    final updatedTasks =
+        state.alltasks
+            .map((t) => t.id == event.task.id ? event.task : t)
+            .toList();
+    emit(
+      state.copyWith(
+        alltasks: updatedTasks,
+        filteredTasks: _buildFilteredTasks(
+          allTasks: updatedTasks,
+          filters: state.currentFilters,
+          tabIndex: state.currentTaskIndex,
+        ),
+      ),
+    );
+
+    // 2. Background Database Update
+    final result = await _firestoreService.editTask(event.task);
+    if (result.isSuccess) {
       emit(
-        DashboardDataSucssfulState(
-          successMessage: 'Task updated successfully.',
+        state.copyWith(
+          uiAction: DashboardUIAction(
+            type: UIActionType.success,
+            message: 'Task updated',
+          ),
         ),
       );
-    } on AppFailure catch (e) {
-      emit(DashboardDataErrorState(error: e.message));
-    } catch (_) {
+    } else {
       emit(
-        DashboardDataErrorState(
-          error: 'Failed to update task. Please check your connection.',
+        state.copyWith(
+          uiAction: DashboardUIAction(
+            type: UIActionType.error,
+            message: result.failure!.message,
+          ),
         ),
       );
     }
@@ -134,19 +174,38 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     DashboardDeleteTaskEvent event,
     Emitter<DashboardState> emit,
   ) async {
-    try {
-      await _firestoreService.deleteTask(event.taskId);
+    final updatedTasks =
+        state.alltasks.where((t) => t.id != event.taskId).toList();
+
+    emit(
+      state.copyWith(
+        alltasks: updatedTasks,
+        filteredTasks: _buildFilteredTasks(
+          allTasks: updatedTasks,
+          filters: state.currentFilters,
+          tabIndex: state.currentTaskIndex,
+        ),
+      ),
+    );
+
+    final result = await _firestoreService.deleteTask(event.taskId);
+
+    if (result.isSuccess) {
       emit(
-        DashboardDataSucssfulState(
-          successMessage: 'Task deleted successfully.',
+        state.copyWith(
+          uiAction: DashboardUIAction(
+            type: UIActionType.success,
+            message: 'Task deleted successfully.',
+          ),
         ),
       );
-    } on AppFailure catch (e) {
-      emit(DashboardDataErrorState(error: e.message));
-    } catch (_) {
+    } else {
       emit(
-        DashboardDataErrorState(
-          error: 'Failed to delete task. Please check your connection.',
+        state.copyWith(
+          uiAction: DashboardUIAction(
+            type: UIActionType.error,
+            message: result.failure!.message,
+          ),
         ),
       );
     }
@@ -156,25 +215,20 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     DashboardHighlightTaskEvent event,
     Emitter<DashboardState> emit,
   ) {
-    if (state is DashboardDataLoadedState) {
-      final currentState = state as DashboardDataLoadedState;
-      emit(currentState.copyWith(highlightedTaskId: event.highlightedTaskId));
-    }
+    emit(state.copyWith(highlightedTaskId: event.highlightedTaskId));
   }
 
   void _onFilterChanged(
     DashboardUpdateFiltersEvent event,
     Emitter<DashboardState> emit,
   ) {
-    if (state is! DashboardDataLoadedState) return;
-    final currentState = state as DashboardDataLoadedState;
     final filteredTasks = _buildFilteredTasks(
-      allTasks: currentState.alltasks,
+      allTasks: state.alltasks,
       filters: event.filters,
-      tabIndex: currentState.currentTaskIndex,
+      tabIndex: state.currentTaskIndex,
     );
     emit(
-      currentState.copyWith(
+      state.copyWith(
         currentFilters: event.filters,
         filteredTasks: filteredTasks,
       ),
@@ -185,15 +239,13 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     DashboardTabChangedEvent event,
     Emitter<DashboardState> emit,
   ) {
-    if (state is! DashboardDataLoadedState) return;
-    final currentState = state as DashboardDataLoadedState;
     final filteredTasks = _buildFilteredTasks(
-      allTasks: currentState.alltasks,
-      filters: currentState.currentFilters,
+      allTasks: state.alltasks,
+      filters: state.currentFilters,
       tabIndex: event.tabIndex,
     );
     emit(
-      currentState.copyWith(
+      state.copyWith(
         currentTaskIndex: event.tabIndex,
         filteredTasks: filteredTasks,
       ),
@@ -204,76 +256,63 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     DashboardUpdateTaskStatusEvent event,
     Emitter<DashboardState> emit,
   ) async {
-    try {
+    // 1. Optimistic Update
+    final updatedTasks =
+        state.alltasks.map((t) {
+          if (t.id == event.taskId) {
+            return t.copyWith(
+              status:
+                  event.isCompleted ? TaskStatus.completed : TaskStatus.todo,
+              completedAt: event.isCompleted ? DateTime.now() : null,
+            );
+          }
+          return t;
+        }).toList();
+
+    emit(
+      state.copyWith(
+        alltasks: updatedTasks,
+        filteredTasks: _buildFilteredTasks(
+          allTasks: updatedTasks,
+          filters: state.currentFilters,
+          tabIndex: state.currentTaskIndex,
+        ),
+      ),
+    );
+
+    // 2. Background Sync
+    Result<void> result;
+    if (event.isCompleted) {
+      result = await _firestoreService.markTaskAsCompleted(event.taskId);
+    } else {
+      final existingTask = state.alltasks.firstWhere(
+        (t) => t.id == event.taskId,
+      );
+      result = await _firestoreService.editTask(
+        existingTask.copyWith(status: TaskStatus.todo, completedAt: null),
+      );
+    }
+
+    // 3. Side Effects
+    if (result.isSuccess) {
       if (event.isCompleted) {
-        await _firestoreService.markTaskAsCompleted(event.taskId);
-        emit(DashboardTaskCompletedState());
-      } else {
-        if (state is! DashboardDataLoadedState) {
-          throw const FirestoreFailure('Task data is not loaded yet.');
-        }
-        final currentState = state as DashboardDataLoadedState;
-        final existingTask = currentState.alltasks.where(
-          (task) => task.id == event.taskId,
-        );
-        if (existingTask.isEmpty) {
-          throw const FirestoreFailure('Task not found.');
-        }
-        await _firestoreService.editTask(
-          existingTask.first.copyWith(
-            status: TaskStatus.todo,
-            completedAt: null,
+        // Triggers Confetti without losing the state!
+        emit(
+          state.copyWith(
+            uiAction: DashboardUIAction(type: UIActionType.confetti),
           ),
         );
       }
-    } on AppFailure catch (e) {
-      emit(DashboardDataErrorState(error: e.message));
-    } catch (_) {
+    } else {
       emit(
-        DashboardDataErrorState(
-          error: 'Failed to update task status. Please check your connection.',
+        state.copyWith(
+          uiAction: DashboardUIAction(
+            type: UIActionType.error,
+            message: result.failure!.message,
+          ),
         ),
       );
     }
-  }
-
-  void _onTasksChanged(
-    _DashboardTasksChanged event,
-    Emitter<DashboardState> emit,
-  ) {
-    if (state is DashboardDataLoadedState) {
-      final currentState = state as DashboardDataLoadedState;
-      final filteredTasks = _buildFilteredTasks(
-        allTasks: event.tasks,
-        filters: currentState.currentFilters,
-        tabIndex: currentState.currentTaskIndex,
-      );
-      emit(
-        currentState.copyWith(
-          alltasks: event.tasks,
-          filteredTasks: filteredTasks,
-          quote: _currentQuote, // Ensure the quote persists when tasks update
-        ),
-      );
-      return;
-    }
-
-    const defaultFilters = FilterModel();
-    const defaultTab = 0;
-    final filteredTasks = _buildFilteredTasks(
-      allTasks: event.tasks,
-      filters: defaultFilters,
-      tabIndex: defaultTab,
-    );
-    emit(
-      DashboardDataLoadedState(
-        alltasks: event.tasks,
-        filteredTasks: filteredTasks,
-        currentFilters: defaultFilters,
-        currentTaskIndex: defaultTab,
-        quote: _currentQuote, // Inject the quote on initial stream load
-      ),
-    );
   }
 
   @override

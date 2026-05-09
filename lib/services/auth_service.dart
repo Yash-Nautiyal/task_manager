@@ -1,23 +1,10 @@
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:task_app/core/error/failures.dart';
+import 'package:task_app/core/utils/result.dart';
 
 import '../core/error/messages/execption_messages.dart';
-
-class AuthOperationResult {
-  const AuthOperationResult({this.user, this.errorMessage});
-
-  final User? user;
-  final String? errorMessage;
-
-  bool get isSuccess => errorMessage == null;
-
-  factory AuthOperationResult.success([User? user]) =>
-      AuthOperationResult(user: user);
-
-  factory AuthOperationResult.failure(String message) =>
-      AuthOperationResult(errorMessage: message);
-}
 
 class AuthService {
   AuthService({FirebaseAuth? firebaseAuth, Duration? requestTimeout})
@@ -38,7 +25,7 @@ class AuthService {
 
   User? get currentUser => _auth.currentUser;
 
-  Future<AuthOperationResult> signUpWithEmailAndPassword({
+  Future<Result<User?>> signUpWithEmailAndPassword({
     required String email,
     required String password,
     String? displayName,
@@ -54,19 +41,21 @@ class AuthService {
         await _withTimeout(user.updateDisplayName(displayName.trim()));
         await _withTimeout(user.reload());
       }
-      return AuthOperationResult.success(_auth.currentUser ?? user);
+      return Result.success(_auth.currentUser ?? user);
     } on TimeoutException {
-      return AuthOperationResult.failure(AuthExceptionMessages.requestTimedOut);
+      return Result.failure(const TimeoutFailure());
     } on FirebaseAuthException catch (e) {
-      return AuthOperationResult.failure(
-        AuthExceptionMessages.messageForCode(e.code),
+      return Result.failure(
+        AuthFailure(AuthExceptionMessages.messageForCode(e.code)),
       );
     } catch (_) {
-      return AuthOperationResult.failure(AuthExceptionMessages.unexpectedError);
+      return Result.failure(
+        const AuthFailure(AuthExceptionMessages.unexpectedError),
+      );
     }
   }
 
-  Future<AuthOperationResult> signInWithEmailAndPassword({
+  Future<Result<User?>> signInWithEmailAndPassword({
     required String email,
     required String password,
   }) async {
@@ -74,45 +63,51 @@ class AuthService {
       final credential = await _withTimeout(
         _auth.signInWithEmailAndPassword(email: email, password: password),
       );
-      return AuthOperationResult.success(credential.user);
+      return Result.success(credential.user);
     } on TimeoutException {
-      return AuthOperationResult.failure(AuthExceptionMessages.requestTimedOut);
+      return Result.failure(const TimeoutFailure());
     } on FirebaseAuthException catch (e) {
-      return AuthOperationResult.failure(
-        AuthExceptionMessages.messageForCode(e.code),
+      return Result.failure(
+        AuthFailure(AuthExceptionMessages.messageForCode(e.code)),
       );
     } catch (_) {
-      return AuthOperationResult.failure(AuthExceptionMessages.unexpectedError);
+      return Result.failure(
+        const AuthFailure(AuthExceptionMessages.unexpectedError),
+      );
     }
   }
 
-  Future<AuthOperationResult> signOut() async {
+  Future<Result<void>> signOut() async {
     try {
       await _withTimeout(_auth.signOut());
-      return AuthOperationResult.success();
+      return Result.success(null);
     } on TimeoutException {
-      return AuthOperationResult.failure(AuthExceptionMessages.requestTimedOut);
+      return Result.failure(const TimeoutFailure());
     } on FirebaseAuthException catch (e) {
-      return AuthOperationResult.failure(
-        AuthExceptionMessages.messageForCode(e.code),
+      return Result.failure(
+        AuthFailure(AuthExceptionMessages.messageForCode(e.code)),
       );
     } catch (_) {
-      return AuthOperationResult.failure(AuthExceptionMessages.unexpectedError);
+      return Result.failure(
+        const AuthFailure(AuthExceptionMessages.unexpectedError),
+      );
     }
   }
 
-  Future<AuthOperationResult> sendPasswordResetEmail(String email) async {
+  Future<Result<void>> sendPasswordResetEmail(String email) async {
     try {
       await _withTimeout(_auth.sendPasswordResetEmail(email: email.trim()));
-      return AuthOperationResult.success();
+      return Result.success(null);
     } on TimeoutException {
-      return AuthOperationResult.failure(AuthExceptionMessages.requestTimedOut);
+      return Result.failure(const TimeoutFailure());
     } on FirebaseAuthException catch (e) {
-      return AuthOperationResult.failure(
-        AuthExceptionMessages.messageForCode(e.code),
+      return Result.failure(
+        AuthFailure(AuthExceptionMessages.messageForCode(e.code)),
       );
     } catch (_) {
-      return AuthOperationResult.failure(AuthExceptionMessages.unexpectedError);
+      return Result.failure(
+        const AuthFailure(AuthExceptionMessages.unexpectedError),
+      );
     }
   }
 }

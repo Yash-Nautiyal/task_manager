@@ -5,27 +5,29 @@ import '../db_task_list.dart';
 
 class TaskSection extends StatelessWidget {
   final String userId;
+  final ThemeData theme;
   final TabController tabController;
   final ScrollController scrollController;
-  final ThemeData theme;
   final Task? prioritytask;
   final List<Task> sortedTasks;
   final bool showAllTasks;
   final Function toggleTaskList;
-  final AnimationController expandController;
   final Function showAddTaskDialog;
+  final AnimationController expandController;
+  final Function(String taskId, bool value) completeTask;
   const TaskSection({
     super.key,
+    required this.theme,
     required this.userId,
     required this.tabController,
     required this.scrollController,
-    required this.theme,
     required this.prioritytask,
     required this.sortedTasks,
     required this.showAllTasks,
     required this.toggleTaskList,
     required this.showAddTaskDialog,
     required this.expandController,
+    required this.completeTask,
   });
 
   @override
@@ -47,7 +49,7 @@ class TaskSection extends StatelessWidget {
               showAddTaskDialog:
                   (task) => showAddTaskDialog(task: task, isEdit: true),
               onDeleteTask: (taskId) async {},
-              onCompleteTask: (taskId, value) {},
+              onCompleteTask: (taskId, value) => completeTask(taskId, value),
             ),
           );
         },

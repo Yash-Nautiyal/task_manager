@@ -1,14 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:task_app/core/error/failures.dart';
+import 'package:task_app/core/utils/result.dart';
 import 'package:task_app/models/task_model.dart';
 
 class FirestoreService {
-  FirestoreService({
-    FirebaseFirestore? firestore,
-    FirebaseAuth? auth,
-  }) : _firestore = firestore ?? FirebaseFirestore.instance,
-       _auth = auth ?? FirebaseAuth.instance;
+  FirestoreService({FirebaseFirestore? firestore, FirebaseAuth? auth})
+    : _firestore = firestore ?? FirebaseFirestore.instance,
+      _auth = auth ?? FirebaseAuth.instance;
 
   final FirebaseFirestore _firestore;
   final FirebaseAuth _auth;
@@ -40,15 +39,13 @@ class FirestoreService {
     final data = taskSnapshot.data();
     final ownerId = data?['userId'] as String?;
     if (ownerId != userId) {
-      throw const FirestoreFailure(
-        'You are not allowed to modify this task.',
-      );
+      throw const FirestoreFailure('You are not allowed to modify this task.');
     }
 
     return taskRef;
   }
 
-  Future<void> addTask(Task task) async {
+  Future<Result<void>> addTask(Task task) async {
     final userId = _getCurrentUserId();
     try {
       final taskRef = _tasksCollection.doc();
@@ -58,46 +55,44 @@ class FirestoreService {
         'userId': userId,
       };
       await taskRef.set(payload);
+      return const Result.success(null);
+    } on FirestoreFailure catch (e) {
+      return Result.failure(e);
     } on FirebaseException {
-      throw const FirestoreFailure(
-        'Failed to add task. Please check your connection.',
-      );
+      return Result.failure(const FirestoreFailure('Failed to add task'));
     }
   }
 
-  Future<void> editTask(Task task) async {
+  Future<Result<void>> editTask(Task task) async {
     final userId = _getCurrentUserId();
     try {
       final taskRef = await _getScopedTaskRef(task.id, userId);
-      final payload = <String, dynamic>{
-        ...task.toJson(),
-        'userId': userId,
-      };
+      final payload = <String, dynamic>{...task.toJson(), 'userId': userId};
       await taskRef.update(payload);
-    } on FirestoreFailure {
-      rethrow;
+
+      return const Result.success(null);
+    } on FirestoreFailure catch (e) {
+      return Result.failure(e);
     } on FirebaseException {
-      throw const FirestoreFailure(
-        'Failed to update task. Please check your connection.',
-      );
+      return Result.failure(const FirestoreFailure('Failed to edit task'));
     }
   }
 
-  Future<void> deleteTask(String taskId) async {
+  Future<Result<void>> deleteTask(String taskId) async {
     final userId = _getCurrentUserId();
     try {
       final taskRef = await _getScopedTaskRef(taskId, userId);
       await taskRef.delete();
-    } on FirestoreFailure {
-      rethrow;
+
+      return const Result.success(null);
+    } on FirestoreFailure catch (e) {
+      return Result.failure(e);
     } on FirebaseException {
-      throw const FirestoreFailure(
-        'Failed to delete task. Please check your connection.',
-      );
+      return Result.failure(const FirestoreFailure('Failed to delete task'));
     }
   }
 
-  Future<void> markTaskAsCompleted(String taskId) async {
+  Future<Result<void>> markTaskAsCompleted(String taskId) async {
     final userId = _getCurrentUserId();
     try {
       final taskRef = await _getScopedTaskRef(taskId, userId);
@@ -105,35 +100,33 @@ class FirestoreService {
         'status': TaskStatus.completed.name,
         'completedAt': DateTime.now().toUtc().toIso8601String(),
       });
-    } on FirestoreFailure {
-      rethrow;
+      return const Result.success(null);
+    } on FirestoreFailure catch (e) {
+      return Result.failure(e);
     } on FirebaseException {
-      throw const FirestoreFailure(
-        'Failed to mark task as completed. Please check your connection.',
+      return Result.failure(
+        const FirestoreFailure('Failed to mark task as completed'),
       );
     }
   }
 
   Stream<List<Task>> getTasksStream(String userId) {
-    try {
-      return _tasksCollection
-          .where('userId', isEqualTo: userId)
-          .orderBy('dueDate', descending: false)
-          .snapshots()
-          .map((snapshot) {
-            return snapshot.docs.map((doc) {
-              final data = doc.data();
-              final taskJson = <String, dynamic>{
-                ...data,
-                'id': (data['id'] as String?) ?? doc.id,
-              };
-              return Task.fromJson(taskJson);
-            }).toList();
-          });
-    } on FirebaseException {
-      throw const FirestoreFailure(
-        'Failed to load tasks. Please check your connection.',
-      );
-    }
+    return _tasksCollection
+        .where('userId', isEqualTo: userId)
+        .orderBy('dueDate')
+        .snapshots()
+        .map(
+          (snapshot) =>
+              snapshot.docs.map((doc) {
+                final data = {...doc.data(), 'id': doc.id};
+                return Task.fromJson(data);
+              }).toList(),
+        )
+        .handleError((e) {
+          if (e is FirebaseException) {
+            throw FirestoreFailure('Failed to load tasks.');
+          }
+          throw const FirestoreFailure('Unexpected error loading tasks.');
+        });
   }
 }
