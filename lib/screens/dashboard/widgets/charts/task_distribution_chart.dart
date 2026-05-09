@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:task_app/core/theme/app_pallete.dart';
 
 import 'package:task_app/models/task_model.dart';
 import 'package:task_app/widgets/common/button/animated_toggle_button.dart';
@@ -115,15 +116,15 @@ class _TaskDistributionChartState extends State<TaskDistributionChart>
       chartData.add(
         ChartData(
           dateLabel,
-          dayTasks.where((t) => t.status == TaskStatus.todo).length.toDouble(),
+          dayTasks
+              .where((t) => !t.isOverdue && t.status != TaskStatus.completed)
+              .length
+              .toDouble(),
           dayTasks
               .where((t) => t.status == TaskStatus.completed)
               .length
               .toDouble(),
-          dayTasks
-              .where((t) => t.status == TaskStatus.overdue)
-              .length
-              .toDouble(),
+          dayTasks.where((t) => t.isOverdue).length.toDouble(),
           date,
         ),
       );
@@ -473,7 +474,7 @@ class _TaskDistributionChartState extends State<TaskDistributionChart>
           FadeTransition(
             opacity: _fadeAnimation,
             child: SizedBox(
-              height: currentView == ChartViewType.week ? 400 : 530,
+              height: currentView == ChartViewType.week ? 400 : 500,
               child:
                   currentView == ChartViewType.month
                       ? CalendarDistribution(
@@ -502,35 +503,55 @@ class _TaskDistributionChartState extends State<TaskDistributionChart>
                         series: <CartesianSeries>[
                           if (_seriesVisibility['To Do'] ?? true)
                             StackedColumnSeries<ChartData, String>(
-                              animationDuration: 500,
+                              animationDuration: 300,
                               dataSource: chartData,
                               xValueMapper: (d, _) => d.period,
                               yValueMapper: (d, _) => d.todo,
                               name: 'To Do',
-                              color: Colors.blue,
+                              gradient: LinearGradient(
+                                colors: [
+                                  AppPallete.infoMain,
+                                  AppPallete.infoMain.withValues(alpha: 0.8),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
                               borderRadius: BorderRadius.circular(2),
                             ),
 
                           if (_seriesVisibility['Completed'] ?? true)
                             StackedColumnSeries<ChartData, String>(
-                              animationDuration: 500,
+                              animationDuration: 300,
 
                               dataSource: chartData,
                               xValueMapper: (d, _) => d.period,
                               yValueMapper: (d, _) => d.completed,
                               name: 'Completed',
-                              color: Colors.green,
+                              gradient: LinearGradient(
+                                colors: [
+                                  AppPallete.successMain,
+                                  AppPallete.successMain.withValues(alpha: 0.8),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
                               borderRadius: BorderRadius.circular(2),
                             ),
                           if (_seriesVisibility['Overdue'] ?? true)
                             StackedColumnSeries<ChartData, String>(
-                              animationDuration: 500,
-
+                              animationDuration: 300,
                               dataSource: chartData,
                               xValueMapper: (d, _) => d.period,
                               yValueMapper: (d, _) => d.overdue,
                               name: 'Overdue',
-                              color: Colors.red,
+                              gradient: LinearGradient(
+                                colors: [
+                                  AppPallete.errorMain,
+                                  AppPallete.errorMain.withValues(alpha: 0.8),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
                               borderRadius: BorderRadius.circular(2),
                             ),
                         ],

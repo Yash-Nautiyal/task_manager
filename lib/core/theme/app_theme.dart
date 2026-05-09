@@ -25,11 +25,15 @@ ThemeData buildTheme({Brightness brightness = Brightness.light}) {
       color:
           brightness == Brightness.dark ? AppPallete.white : AppPallete.grey800,
     ),
-    titleLarge: AppTypography.subtitleLarge.copyWith(
+    titleLarge: AppTypography.titleLarge.copyWith(
       color:
           brightness == Brightness.dark ? AppPallete.white : AppPallete.grey800,
     ),
-    titleMedium: AppTypography.subtitleMedium.copyWith(
+    titleMedium: AppTypography.titleMedium.copyWith(
+      color:
+          brightness == Brightness.dark ? AppPallete.white : AppPallete.grey800,
+    ),
+    titleSmall: AppTypography.titleSmall.copyWith(
       color:
           brightness == Brightness.dark ? AppPallete.white : AppPallete.grey800,
     ),
@@ -49,7 +53,15 @@ ThemeData buildTheme({Brightness brightness = Brightness.light}) {
               ? AppPallete.grey600
               : AppPallete.grey500,
     ),
-    labelLarge: AppTypography.button.copyWith(
+    labelLarge: AppTypography.labelLarge.copyWith(
+      color:
+          brightness == Brightness.dark ? AppPallete.white : AppPallete.grey800,
+    ),
+    labelMedium: AppTypography.labelMedium.copyWith(
+      color:
+          brightness == Brightness.dark ? AppPallete.white : AppPallete.grey800,
+    ),
+    labelSmall: AppTypography.labelSmall.copyWith(
       color:
           brightness == Brightness.dark ? AppPallete.white : AppPallete.grey800,
     ),

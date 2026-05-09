@@ -32,15 +32,21 @@ class AppTypography {
     height: 1.5,
   );
 
-  static const TextStyle subtitleLarge = TextStyle(
+  static const TextStyle titleLarge = TextStyle(
     fontWeight: semiBold,
     fontSize: 20,
     height: 1.5,
   );
 
-  static const TextStyle subtitleMedium = TextStyle(
+  static const TextStyle titleMedium = TextStyle(
     fontWeight: semiBold,
     fontSize: 16,
+    height: 1.5,
+  );
+
+  static const TextStyle titleSmall = TextStyle(
+    fontWeight: semiBold,
+    fontSize: 14,
     height: 1.5,
   );
 
@@ -50,9 +56,20 @@ class AppTypography {
 
   static const TextStyle bodySmall = TextStyle(fontSize: 12, height: 1.5);
 
-  static const TextStyle button = TextStyle(
+  static const TextStyle labelLarge = TextStyle(
     fontWeight: bold,
     fontSize: 14,
+    height: 24 / 14,
+  );
+
+  static const TextStyle labelMedium = TextStyle(
+    fontWeight: bold,
+    fontSize: 12,
+    height: 24 / 14,
+  );
+  static const TextStyle labelSmall = TextStyle(
+    fontWeight: bold,
+    fontSize: 10,
     height: 24 / 14,
   );
 }

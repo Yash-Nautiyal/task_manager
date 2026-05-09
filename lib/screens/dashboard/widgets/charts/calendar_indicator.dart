@@ -24,7 +24,13 @@ class CalendarIndicator extends StatelessWidget {
     };
 
     for (final task in tasks) {
-      counts[task.status] = (counts[task.status] ?? 0) + 1;
+      if (task.status == TaskStatus.completed) {
+        counts[TaskStatus.completed] = counts[TaskStatus.completed]! + 1;
+      } else if (task.isOverdue) {
+        counts[TaskStatus.overdue] = counts[TaskStatus.overdue]! + 1;
+      } else {
+        counts[TaskStatus.todo] = counts[TaskStatus.todo]! + 1;
+      }
     }
 
     return counts;

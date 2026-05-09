@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:task_app/core/helpers/date_time_helper.dart';
 import 'package:task_app/core/theme/app_pallete.dart';
 import 'package:task_app/models/task_model.dart';
 
@@ -74,6 +75,13 @@ class _TaskCardState extends State<TaskCard>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final status =
+        widget.task.status == TaskStatus.completed
+            ? TaskStatus.completed
+            : widget.task.isOverdue
+            ? TaskStatus.overdue
+            : TaskStatus.todo;
+
     return AnimatedBuilder(
       key: ValueKey(widget.task.id),
       animation: _highlightController,
@@ -88,7 +96,7 @@ class _TaskCardState extends State<TaskCard>
                     : null,
             border: Border.all(
               color:
-                  widget.task.status == TaskStatus.completed
+                  status == TaskStatus.completed
                       ? AppPallete.successMain
                       : theme.dividerColor.withAlpha(100),
               width: 1.5,
@@ -110,8 +118,8 @@ class _TaskCardState extends State<TaskCard>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (widget.task.status == TaskStatus.overdue ||
-                  widget.task.status == TaskStatus.completed)
+              if (status == TaskStatus.overdue ||
+                  status == TaskStatus.completed)
                 Padding(
                   padding: const EdgeInsets.all(8.0).copyWith(bottom: 0),
                   child: Container(
@@ -120,15 +128,13 @@ class _TaskCardState extends State<TaskCard>
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: widget.task.status.color.withValues(alpha: .15),
+                      color: status.color.withValues(alpha: .15),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      widget.task.status.name[0].toUpperCase() +
-                          widget.task.status.name.substring(1),
-                      style: theme.textTheme.labelLarge?.copyWith(
-                        color: widget.task.status.color.withValues(alpha: .15),
-                        fontSize: 12,
+                      status.text,
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: status.color,
                       ),
                     ),
                   ),
@@ -139,8 +145,8 @@ class _TaskCardState extends State<TaskCard>
                 padding: EdgeInsets.only(
                   right: 16.0,
                   top:
-                      widget.task.status != TaskStatus.completed
-                          ? widget.task.status != TaskStatus.overdue
+                      status != TaskStatus.completed
+                          ? status != TaskStatus.overdue
                               ? 10
                               : 0
                           : 0,
@@ -150,7 +156,7 @@ class _TaskCardState extends State<TaskCard>
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Checkbox(
-                      value: widget.task.status == TaskStatus.completed,
+                      value: status == TaskStatus.completed,
                       activeColor: AppPallete.successMain,
                       checkColor: AppPallete.white,
                       onChanged: (value) {
@@ -165,11 +171,11 @@ class _TaskCardState extends State<TaskCard>
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w700,
                           decoration:
-                              widget.task.status == TaskStatus.completed
+                              status == TaskStatus.completed
                                   ? TextDecoration.lineThrough
                                   : null,
                           color:
-                              widget.task.status == TaskStatus.completed
+                              status == TaskStatus.completed
                                   ? AppPallete.successMain
                                   : null,
                         ),
@@ -200,7 +206,7 @@ class _TaskCardState extends State<TaskCard>
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if (widget.task.status == TaskStatus.completed)
+                        if (status == TaskStatus.completed)
                           Container(
                             decoration: BoxDecoration(
                               color: AppPallete.successLight.withValues(
@@ -229,7 +235,7 @@ class _TaskCardState extends State<TaskCard>
                                 Text(
                                   'Completed: ${widget.task.status == TaskStatus.completed
                                       ? widget.task.completedAt != null
-                                          ? widget.task.completedAt!
+                                          ? formatDateTime(widget.task.completedAt!)
                                           : "--"
                                       : 'Not completed'}',
                                   style: theme.textTheme.labelLarge?.copyWith(
@@ -258,7 +264,7 @@ class _TaskCardState extends State<TaskCard>
                               ),
                               const SizedBox(width: 6),
                               Text(
-                                'Due: ${widget.task.dueDate.toLocal().toString()}',
+                                'Due: ${formatDateTime(widget.task.dueDate)}',
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: theme.colorScheme.outline,
                                   fontWeight: FontWeight.w700,
@@ -270,7 +276,7 @@ class _TaskCardState extends State<TaskCard>
                       ],
                     ),
                     const Spacer(),
-                    if (widget.task.status != TaskStatus.completed)
+                    if (status != TaskStatus.completed)
                       IconButton(
                         icon: SvgPicture.asset(
                           AppIcons.penBoldIcon,
@@ -282,7 +288,7 @@ class _TaskCardState extends State<TaskCard>
                         ),
                         onPressed: () => widget.onEdit.call(),
                       ),
-                    if (widget.task.status != TaskStatus.completed)
+                    if (status != TaskStatus.completed)
                       IconButton(
                         icon: SvgPicture.asset(
                           AppIcons.trashBoldIcon,

@@ -7,9 +7,17 @@ import '../theme/app_pallete.dart';
 
 extension TaskStatusColorExtension on TaskStatus {
   Color get color => switch (this) {
-    TaskStatus.todo => AppPallete.primaryMain,
+    TaskStatus.todo => AppPallete.infoMain,
     TaskStatus.completed => AppPallete.successMain,
     TaskStatus.overdue => AppPallete.errorMain,
+  };
+}
+
+extension TaskStatusTextExtension on TaskStatus {
+  String get text => switch (this) {
+    TaskStatus.todo => 'To Do',
+    TaskStatus.completed => 'Completed',
+    TaskStatus.overdue => 'Overdue',
   };
 }
 

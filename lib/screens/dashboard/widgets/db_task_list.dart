@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:task_app/models/task_model.dart';
 
+import 'empty_tasks.dart';
 import 'task_card.dart';
 
 class DbTaskList extends StatelessWidget {
@@ -31,7 +32,7 @@ class DbTaskList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (filteredTasks.isEmpty) {
-      return const SizedBox.shrink();
+      return const EmptyTasks();
     }
     final priorityTask = prioritytask;
     final remainingTasks =

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:task_app/core/helpers/task_helpers.dart';
 import 'package:task_app/core/theme/app_pallete.dart';
 import 'package:task_app/models/task_model.dart';
 import 'task_overlay.dart';
@@ -123,9 +124,9 @@ class _CalendarDistributionState extends State<CalendarDistribution>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.3), width: 1),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -135,14 +136,14 @@ class _CalendarDistributionState extends State<CalendarDistribution>
             height: 8,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [color, color.withOpacity(0.8)],
+                colors: [color, color.withValues(alpha: 0.8)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: color.withOpacity(0.3),
+                  color: color.withValues(alpha: 0.3),
                   blurRadius: 2,
                   offset: const Offset(0, 1),
                 ),
@@ -226,10 +227,8 @@ class _CalendarDistributionState extends State<CalendarDistribution>
                   spacing: 12,
                   runSpacing: 8,
                   children: [
-                    _buildModernLegendItem('To Do', Colors.blue),
-                    _buildModernLegendItem('In Progress', Colors.orange),
-                    _buildModernLegendItem('Completed', Colors.green),
-                    _buildModernLegendItem('Overdue', AppPallete.errorMain),
+                    for (TaskStatus status in TaskStatus.values)
+                      _buildModernLegendItem(status.text, status.color),
                   ],
                 ),
               ),
@@ -415,14 +414,14 @@ class _CalendarDistributionState extends State<CalendarDistribution>
 
                       Color borderColor;
 
-                      if (dayTasks.any((t) => t.status == TaskStatus.overdue)) {
+                      if (dayTasks.any((t) => t.isOverdue)) {
                         borderColor = AppPallete.errorMain;
                       } else if (dayTasks.any(
-                        (t) => t.status == TaskStatus.todo,
+                        (t) => t.status == TaskStatus.completed,
                       )) {
-                        borderColor = AppPallete.infoMain;
-                      } else {
                         borderColor = AppPallete.successMain;
+                      } else {
+                        borderColor = AppPallete.infoMain;
                       }
 
                       return Container(

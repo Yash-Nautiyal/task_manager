@@ -23,23 +23,18 @@ class CalendarOverlayTaskItem extends StatelessWidget {
     IconData statusIcon;
     String statusText;
 
-    switch (task.status) {
-      case TaskStatus.todo:
-        statusColor = Colors.blue;
-        statusIcon = Icons.radio_button_unchecked;
-        statusText = 'To Do';
-        break;
-
-      case TaskStatus.completed:
-        statusColor = Colors.green;
-        statusIcon = Icons.check_circle;
-        statusText = 'Completed';
-        break;
-      case TaskStatus.overdue:
-        statusColor = AppPallete.errorMain;
-        statusIcon = Icons.error;
-        statusText = 'Overdue';
-        break;
+    if (task.status == TaskStatus.completed) {
+      statusColor = Colors.green;
+      statusIcon = Icons.check_circle;
+      statusText = 'Completed';
+    } else if (task.isOverdue) {
+      statusColor = AppPallete.errorMain;
+      statusIcon = Icons.error;
+      statusText = 'Overdue';
+    } else {
+      statusColor = Colors.blue;
+      statusIcon = Icons.radio_button_unchecked;
+      statusText = 'To Do';
     }
 
     return Row(

@@ -36,6 +36,12 @@ class Task {
     this.status = TaskStatus.todo,
   });
 
+  bool get isOverdue {
+    if (status == TaskStatus.completed) return false;
+
+    return dueDate.isBefore(DateTime.now());
+  }
+
   Task copyWith({
     String? id,
     String? title,
