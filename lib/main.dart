@@ -37,11 +37,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isAuthenticated = AuthService().currentUser != null;
+
     return MaterialApp(
       title: 'Sankar Task Manager',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      initialRoute: AppRoutes.home,
+      initialRoute: isAuthenticated ? AppRoutes.dashboard : AppRoutes.home,
       onGenerateRoute: AppRouter.onGenerateRoute,
     );
   }

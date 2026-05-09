@@ -55,7 +55,7 @@ class _SignupPageState extends State<SignupPage> {
               'Account created. You are signed in.',
               SnackbarType.success,
             );
-            AppRouter.popToRoot(context);
+            AppRouter.replaceWithDashboard(context);
           }
         },
         child: SingleChildScrollView(

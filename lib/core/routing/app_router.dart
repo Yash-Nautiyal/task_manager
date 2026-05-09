@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:task_app/screens/dashboard/bloc/dashboard_bloc.dart';
+import 'package:task_app/screens/dashboard/pages/dashboard_view.dart';
 import 'package:task_app/screens/auth/pages/auth_view.dart';
 import 'package:task_app/screens/auth/widgets/confirm_page.dart';
 import 'package:task_app/screens/auth/widgets/forgot_password.dart';
 import 'package:task_app/screens/auth/widgets/reset_password_page.dart';
 import 'package:task_app/screens/auth/widgets/signup_page.dart';
 import 'package:task_app/screens/home/pages/home_view.dart';
+import 'package:task_app/services/auth_service.dart';
+import 'package:task_app/services/firestore_service.dart';
 import 'package:task_app/widgets/common/header/profile.dart';
 import 'package:task_app/widgets/common/header/settings/settings.dart';
 
@@ -12,6 +17,10 @@ import 'app_routes.dart';
 
 abstract final class AppRouter {
   AppRouter._();
+  static final AuthService _authService = AuthService();
+  static final FirestoreService _firestoreService = FirestoreService();
+
+  static bool get _isAuthenticated => _authService.currentUser != null;
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -21,10 +30,21 @@ abstract final class AppRouter {
           settings: settings,
         );
       case AppRoutes.auth:
+        if (_isAuthenticated) {
+          return _buildDashboardRoute(settings);
+        }
         return MaterialPageRoute<void>(
           builder: (_) => const AuthView(),
           settings: settings,
         );
+      case AppRoutes.dashboard:
+        if (!_isAuthenticated) {
+          return MaterialPageRoute<void>(
+            builder: (_) => const AuthView(),
+            settings: const RouteSettings(name: AppRoutes.auth),
+          );
+        }
+        return _buildDashboardRoute(settings);
       case AppRoutes.signup:
         return MaterialPageRoute<void>(
           builder: (_) => const SignupPage(),
@@ -53,8 +73,23 @@ abstract final class AppRouter {
     }
   }
 
-  static Future<T?> pushAuth<T extends Object?>(BuildContext context) =>
-      Navigator.of(context).pushNamed<T>(AppRoutes.auth);
+  static Future<T?> pushAuth<T extends Object?>(BuildContext context) {
+    if (_isAuthenticated) {
+      return Navigator.of(context).pushNamed<T>(AppRoutes.dashboard);
+    }
+    return Navigator.of(context).pushNamed<T>(AppRoutes.auth);
+  }
+
+  static Future<T?> replaceWithDashboard<T extends Object?>(
+    BuildContext context,
+  ) {
+    if (_isAuthenticated) {
+      return Navigator.of(
+        context,
+      ).pushReplacementNamed<T, T>(AppRoutes.dashboard);
+    }
+    return Navigator.of(context).pushReplacementNamed<T, T>(AppRoutes.auth);
+  }
 
   static Future<T?> pushSignup<T extends Object?>(BuildContext context) =>
       Navigator.of(context).pushNamed<T>(AppRoutes.signup);
@@ -96,6 +131,22 @@ abstract final class AppRouter {
         barrierColor: Colors.black38,
         pageBuilder: (context, _, __) => ProfileDialog(theme: theme),
       ),
+    );
+  }
+
+  static Route<dynamic> _buildDashboardRoute(RouteSettings settings) {
+    final user = _authService.currentUser!;
+    return MaterialPageRoute<void>(
+      builder:
+          (_) => BlocProvider(
+            create: (_) => DashboardBloc(firestoreService: _firestoreService),
+            child: DashboardView(
+              onPageChanged: (_, __) {},
+              user: user,
+              userId: user.uid,
+            ),
+          ),
+      settings: settings,
     );
   }
 }
