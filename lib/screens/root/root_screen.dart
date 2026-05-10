@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../widgets/common/appBar/home_appbar.dart';
+import '../../widgets/common/dialog/snackbar_dialog.dart';
 import '../dashboard/bloc/dashboard_bloc.dart';
 import '../dashboard/pages/dashboard_view.dart';
 import '../tasks/pages/task_list.dart';
@@ -78,35 +79,57 @@ class _RootScreenState extends State<RootScreen> {
 
     return BlocProvider.value(
       value: _dashboardBloc,
-      child: ScrollConfiguration(
-        behavior: const MaterialScrollBehavior().copyWith(overscroll: false),
-        child: RefreshIndicator(
-          onRefresh: _refreshTasks,
-          child: Scaffold(
-            resizeToAvoidBottomInset: false,
-            extendBodyBehindAppBar: true,
-            appBar: HomeAppBar(
-              theme: theme,
-              dashboardPage: true,
-              currentIndex: _currentIndex,
-              onPageChanged: _onPageChanged,
-            ),
-            body: SafeArea(
-              top: false,
-              child: IndexedStack(
-                index: _currentIndex,
-                children: [
-                  DashboardView(
-                    onPageChanged: _onPageChanged,
-                    userId: widget.user.uid,
-                    user: widget.user,
-                  ),
+      child: BlocListener<DashboardBloc, DashboardState>(
+        listenWhen:
+            (previous, current) =>
+                current.uiAction != null &&
+                previous.uiAction != current.uiAction,
+        listener: (context, state) {
+          final action = state.uiAction!;
+          if (action.type == UIActionType.error) {
+            showAnimatedSnackbar(
+              context,
+              action.message ?? 'Error',
+              SnackbarType.error,
+            );
+          } else if (action.type == UIActionType.success) {
+            showAnimatedSnackbar(
+              context,
+              action.message ?? 'Success',
+              SnackbarType.success,
+            );
+          }
+        },
+        child: ScrollConfiguration(
+          behavior: const MaterialScrollBehavior().copyWith(overscroll: false),
+          child: RefreshIndicator(
+            onRefresh: _refreshTasks,
+            child: Scaffold(
+              resizeToAvoidBottomInset: false,
+              extendBodyBehindAppBar: true,
+              appBar: HomeAppBar(
+                theme: theme,
+                dashboardPage: true,
+                currentIndex: _currentIndex,
+                onPageChanged: _onPageChanged,
+              ),
+              body: SafeArea(
+                top: false,
+                child: IndexedStack(
+                  index: _currentIndex,
+                  children: [
+                    DashboardView(
+                      onPageChanged: _onPageChanged,
+                      userId: widget.user.uid,
+                      user: widget.user,
+                    ),
 
-                  TaskList(
-                    highlightTaskId: _highlightedTaskId,
-                    userId: widget.user.uid,
-                  ),
-                ],
+                    TaskList(
+                      highlightTaskId: _highlightedTaskId,
+                      userId: widget.user.uid,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

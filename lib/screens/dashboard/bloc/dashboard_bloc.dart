@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:task_app/core/error/failures.dart'; // Make sure this matches your exception file
 import 'package:task_app/core/helpers/task_helpers.dart';
 import 'package:task_app/core/utils/result.dart';
 import 'package:task_app/services/firestore_service.dart';
@@ -40,7 +39,8 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
   final ApiService _apiService;
   StreamSubscription<List<Task>>? _tasksSubscription;
 
-  String _currentQuote = '"Keep pushing forward." - Unknown';
+  String _currentQuote =
+      '"The secret of getting ahead is getting started." - Mark Twain';
 
   List<Task> _buildFilteredTasks({
     required List<Task> allTasks,
@@ -94,15 +94,23 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     DashboardFetchQuoteEvent event,
     Emitter<DashboardState> emit,
   ) async {
-    try {
-      final response = await _apiService.fetchRandomQuote();
-      if (response.isSuccess) {
-        _currentQuote = response.data!;
-      }
+    final response = await _apiService.fetchRandomQuote();
+
+    if (response.isSuccess) {
+      _currentQuote = response.data!;
       emit(state.copyWith(quote: _currentQuote));
-    } on AppFailure catch (e) {
-      // If the API fails, silently ignore it. The UI will just use the default _currentQuote.
-      debugPrint('Failed to fetch quote: $e');
+    } else {
+      emit(state.copyWith(quote: _currentQuote));
+      // emit(
+      //   state.copyWith(
+      //     quote: _currentQuote,
+      //     uiAction: DashboardUIAction(
+      //       type: UIActionType.error,
+      //       message: response.failure!.message,
+      //     ),
+      //   ),
+      // );
+      debugPrint('Failed to fetch quote: ${response.failure!.message}');
     }
   }
 

@@ -5,7 +5,6 @@ import 'package:scrollview_observer/scrollview_observer.dart';
 
 import '../../../core/helpers/task_helpers.dart';
 import '../../../models/task_model.dart';
-import '../../../widgets/common/dialog/snackbar_dialog.dart';
 import '../../dashboard/bloc/dashboard_bloc.dart';
 import '../../dashboard/widgets/db_add_button.dart';
 import '../../dashboard/widgets/db_filters.dart';
@@ -136,19 +135,7 @@ class _TaskListState extends State<TaskList> {
                   previous.uiAction != current.uiAction,
           listener: (context, state) {
             final action = state.uiAction!;
-            if (action.type == UIActionType.error) {
-              showAnimatedSnackbar(
-                context,
-                action.message ?? 'Error',
-                SnackbarType.error,
-              );
-            } else if (action.type == UIActionType.success) {
-              showAnimatedSnackbar(
-                context,
-                action.message ?? 'Success',
-                SnackbarType.success,
-              );
-            } else if (action.type == UIActionType.confetti) {
+            if (action.type == UIActionType.confetti) {
               _triggerConfetti();
             }
           },

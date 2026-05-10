@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:task_app/widgets/common/dialog/snackbar_dialog.dart';
 import 'package:task_app/widgets/common/loader/custom_loader.dart';
 import '../../../core/helpers/task_helpers.dart'
     show applyFilters, getSortedTasks;
@@ -150,19 +149,7 @@ class _DashboardViewState extends State<DashboardView>
               current.uiAction != null && previous.uiAction != current.uiAction,
       listener: (context, state) {
         final action = state.uiAction!;
-        if (action.type == UIActionType.error) {
-          showAnimatedSnackbar(
-            context,
-            action.message ?? 'Error',
-            SnackbarType.error,
-          );
-        } else if (action.type == UIActionType.success) {
-          showAnimatedSnackbar(
-            context,
-            action.message ?? 'Success',
-            SnackbarType.success,
-          );
-        } else if (action.type == UIActionType.confetti) {
+        if (action.type == UIActionType.confetti) {
           _triggerConfetti();
         }
       },
@@ -178,7 +165,8 @@ class _DashboardViewState extends State<DashboardView>
                     (previous, current) =>
                         previous.status != current.status ||
                         previous.alltasks != current.alltasks ||
-                        previous.currentTaskIndex != current.currentTaskIndex,
+                        previous.currentTaskIndex != current.currentTaskIndex ||
+                        previous.currentFilters != current.currentFilters,
                 builder: (context, state) {
                   if (state.status == DashboardStatus.loading ||
                       state.status == DashboardStatus.initial) {

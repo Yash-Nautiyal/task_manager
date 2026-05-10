@@ -24,10 +24,7 @@ class DbHeader extends StatelessWidget {
       children: [
         AnimatedGradientText(
           text: 'Hello, $userFirstName!',
-          style: theme.textTheme.headlineMedium?.copyWith(
-            color: AppPallete.white,
-            fontWeight: FontWeight.bold,
-          ),
+          style: theme.textTheme.displayMedium,
           animation: controller,
           colors: [
             AppPallete.warningMain,

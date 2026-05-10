@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:task_app/models/task_model.dart';
 import '../../../../models/filter_model.dart';
+import '../../bloc/dashboard_bloc.dart';
 import '../db_add_button.dart';
 import '../db_filters.dart';
 import '../db_header.dart';
@@ -13,7 +15,7 @@ class HeaderSection extends StatelessWidget {
   final User? user;
   final List<Task> allTasks;
   final FilterModel currentFilters;
-  final String quote; 
+  final String quote;
   final VoidCallback showAddTaskDialog;
   const HeaderSection({
     super.key,
@@ -50,7 +52,11 @@ class HeaderSection extends StatelessWidget {
               theme: theme,
               allTasks: allTasks,
               currentFilters: currentFilters,
-              onFiltersChanged: (newFilters) {},
+              onFiltersChanged: (newFilters) {
+                context.read<DashboardBloc>().add(
+                  DashboardUpdateFiltersEvent(filters: newFilters),
+                );
+              },
             ),
             DbAddButton(
               theme: theme,

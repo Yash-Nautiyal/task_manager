@@ -35,7 +35,8 @@ class DashboardState extends Equatable {
     this.status = DashboardStatus.initial,
     this.uiAction,
     this.globalError,
-    this.quote = '"Keep pushing forward." - Unknown',
+    this.quote =
+        '"The secret of getting ahead is getting started." - Mark Twain',
     this.alltasks = const [],
     this.filteredTasks = const [],
     this.taskListFilters = const FilterModel(),
