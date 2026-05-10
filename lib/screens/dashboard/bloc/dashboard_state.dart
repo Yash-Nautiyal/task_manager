@@ -22,10 +22,10 @@ class DashboardState extends Equatable {
   final DashboardStatus status;
   final DashboardUIAction? uiAction;
   final String? globalError;
-
   final String quote;
   final List<Task> alltasks;
   final List<Task> filteredTasks;
+  final FilterModel taskListFilters;
   final FilterModel currentFilters;
   final String? highlightedTaskId;
   final int currentTaskIndex;
@@ -37,6 +37,7 @@ class DashboardState extends Equatable {
     this.quote = '"Keep pushing forward." - Unknown',
     this.alltasks = const [],
     this.filteredTasks = const [],
+    this.taskListFilters = const FilterModel(),
     this.currentFilters = const FilterModel(),
     this.currentTaskIndex = 0,
     this.highlightedTaskId,
@@ -50,6 +51,7 @@ class DashboardState extends Equatable {
     quote,
     alltasks,
     filteredTasks,
+    taskListFilters,
     currentFilters,
     highlightedTaskId,
     currentTaskIndex,
@@ -62,6 +64,7 @@ class DashboardState extends Equatable {
     String? quote,
     List<Task>? alltasks,
     List<Task>? filteredTasks,
+    FilterModel? taskListFilters,
     FilterModel? currentFilters,
     int? currentTaskIndex,
     String? highlightedTaskId,
@@ -73,6 +76,7 @@ class DashboardState extends Equatable {
       quote: quote ?? this.quote,
       alltasks: alltasks ?? this.alltasks,
       filteredTasks: filteredTasks ?? this.filteredTasks,
+      taskListFilters: taskListFilters ?? this.taskListFilters,
       currentFilters: currentFilters ?? this.currentFilters,
       currentTaskIndex: currentTaskIndex ?? this.currentTaskIndex,
       highlightedTaskId: highlightedTaskId ?? this.highlightedTaskId,

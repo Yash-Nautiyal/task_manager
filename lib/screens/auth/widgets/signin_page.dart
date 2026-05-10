@@ -135,16 +135,16 @@ class _AuthPageState extends State<AuthPage> {
               },
             ),
             const SizedBox(height: 10),
-            Align(
-              alignment: Alignment.centerRight,
-              child: GestureDetector(
-                onTap: () => AppRouter.pushForgotPassword(context),
-                child: Text(
-                  "Forgot password?",
-                  style: theme.textTheme.bodyMedium,
-                ),
-              ),
-            ),
+            // Align(
+            //   alignment: Alignment.centerRight,
+            //   child: GestureDetector(
+            //     onTap: () => AppRouter.pushForgotPassword(context),
+            //     child: Text(
+            //       "Forgot password?",
+            //       style: theme.textTheme.bodyMedium,
+            //     ),
+            //   ),
+            // ),
             const SizedBox(height: 30),
             SizedBox(
               width: double.infinity,

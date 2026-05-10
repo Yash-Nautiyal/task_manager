@@ -100,8 +100,10 @@ List<Task> applyFilters(
   List<Task> tasks,
   FilterModel filters, {
   int tabIndex = 0,
+  bool applyTabFilter = true,
 }) {
-  List<Task> filtered = getFilteredTasks(tabIndex, tasks);
+  List<Task> filtered =
+      applyTabFilter ? getFilteredTasks(tabIndex, tasks) : tasks;
 
   if (filters.searchQuery.isNotEmpty) {
     filtered =

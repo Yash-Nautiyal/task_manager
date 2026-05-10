@@ -4,11 +4,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_app/firebase_options.dart';
 import 'package:task_app/screens/auth/bloc/auth_bloc.dart';
+import 'package:task_app/screens/root/root_screen.dart';
 import 'package:task_app/services/auth_service.dart';
+import 'package:task_app/widgets/common/loader/custom_loader.dart';
 
 import 'core/routing/app_router.dart';
-import 'core/routing/app_routes.dart';
 import 'core/theme/app_theme.dart';
+import 'screens/home/pages/home_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,16 +39,24 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isAuthenticated = AuthService().currentUser != null;
-
-    debugPrint('User is authenticated: $isAuthenticated');
-
     return MaterialApp(
       title: 'Sankar Task Manager',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      initialRoute: AppRoutes.home,
       onGenerateRoute: AppRouter.onGenerateRoute,
+      home: BlocBuilder<AuthBloc, AuthState>(
+        builder: (context, state) {
+          if (state is AuthInitial || state is AuthLoading) {
+            return const Scaffold(body: CustomLoader());
+          }
+
+          if (state is Authenticated) {
+            return RootScreen(user: state.user); // Pass it here!
+          }
+
+          return const HomeView();
+        },
+      ),
     );
   }
 }

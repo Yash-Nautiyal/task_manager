@@ -57,6 +57,15 @@ class DashboardUpdateFiltersEvent extends DashboardEvent {
   List<Object?> get props => [filters];
 }
 
+class DashboardUpdateTaskListFiltersEvent extends DashboardEvent {
+  final FilterModel filters;
+
+  const DashboardUpdateTaskListFiltersEvent({required this.filters});
+
+  @override
+  List<Object?> get props => [filters];
+}
+
 class DashboardTabChangedEvent extends DashboardEvent {
   final int tabIndex;
 

@@ -3,11 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_app/screens/dashboard/bloc/dashboard_bloc.dart';
 import 'package:task_app/screens/dashboard/pages/dashboard_view.dart';
 import 'package:task_app/screens/auth/pages/auth_view.dart';
-import 'package:task_app/screens/auth/widgets/confirm_page.dart';
-import 'package:task_app/screens/auth/widgets/forgot_password.dart';
-import 'package:task_app/screens/auth/widgets/reset_password_page.dart';
 import 'package:task_app/screens/auth/widgets/signup_page.dart';
 import 'package:task_app/screens/home/pages/home_view.dart';
+import 'package:task_app/screens/root/root_screen.dart';
 import 'package:task_app/services/auth_service.dart';
 import 'package:task_app/services/firestore_service.dart';
 import 'package:task_app/widgets/common/header/profile.dart';
@@ -37,10 +35,10 @@ abstract final class AppRouter {
           builder: (_) => const AuthView(),
           settings: settings,
         );
-      case AppRoutes.dashboard:
+      case AppRoutes.root:
         if (!_isAuthenticated) {
           return MaterialPageRoute<void>(
-            builder: (_) => const AuthView(),
+            builder: (_) => RootScreen(user: _authService.currentUser!),
             settings: const RouteSettings(name: AppRoutes.auth),
           );
         }
@@ -50,21 +48,21 @@ abstract final class AppRouter {
           builder: (_) => const SignupPage(),
           settings: settings,
         );
-      case AppRoutes.forgotPassword:
-        return MaterialPageRoute<void>(
-          builder: (_) => const ForgotPassword(),
-          settings: settings,
-        );
-      case AppRoutes.resetPassword:
-        return MaterialPageRoute<void>(
-          builder: (_) => const ResetPasswordPage(),
-          settings: settings,
-        );
-      case AppRoutes.confirm:
-        return MaterialPageRoute<void>(
-          builder: (_) => const ConfirmPage(),
-          settings: settings,
-        );
+      // case AppRoutes.forgotPassword:
+      //   return MaterialPageRoute<void>(
+      //     builder: (_) => const ForgotPassword(),
+      //     settings: settings,
+      //   );
+      // case AppRoutes.resetPassword:
+      //   return MaterialPageRoute<void>(
+      //     builder: (_) => const ResetPasswordPage(),
+      //     settings: settings,
+      //   );
+      // case AppRoutes.confirm:
+      //   return MaterialPageRoute<void>(
+      //     builder: (_) => const ConfirmPage(),
+      //     settings: settings,
+      //   );
       default:
         return MaterialPageRoute<void>(
           builder: (_) => const _UnknownRouteScreen(),
@@ -75,7 +73,7 @@ abstract final class AppRouter {
 
   static Future<T?> pushAuth<T extends Object?>(BuildContext context) {
     if (_isAuthenticated) {
-      return Navigator.of(context).pushNamed<T>(AppRoutes.dashboard);
+      return Navigator.of(context).pushNamed<T>(AppRoutes.root);
     }
     return Navigator.of(context).pushNamed<T>(AppRoutes.auth);
   }
@@ -84,9 +82,7 @@ abstract final class AppRouter {
     BuildContext context,
   ) {
     if (_isAuthenticated) {
-      return Navigator.of(
-        context,
-      ).pushReplacementNamed<T, T>(AppRoutes.dashboard);
+      return Navigator.of(context).pushReplacementNamed<T, T>(AppRoutes.root);
     }
     return Navigator.of(context).pushReplacementNamed<T, T>(AppRoutes.auth);
   }
@@ -97,7 +93,7 @@ abstract final class AppRouter {
     if (_isAuthenticated) {
       return Navigator.of(
         context,
-      ).pushNamedAndRemoveUntil<T>(AppRoutes.dashboard, (route) => false);
+      ).pushNamedAndRemoveUntil<T>(AppRoutes.root, (route) => false);
     }
     return Navigator.of(
       context,

@@ -4,7 +4,7 @@ class AppIcons {
   static const String _basePath = 'assets/icons';
   static const String _arrowPath = 'assets/icons/arrow';
   static const String _solidPath = 'assets/icons/solid';
-  static const String _illustrationsPath = 'assets/icons/illustrations';
+  static const String _illustrationsPath = 'assets/illustrations';
   static const String _navPath = 'assets/icons/nav';
 
   // illustrations

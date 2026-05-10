@@ -47,6 +47,7 @@ dependencies:
   syncfusion_flutter_charts: ^31.1.19
   intl: ^0.20.2
   http: ^1.6.0
+  scrollview_observer: ^1.26.3
 
 dev_dependencies:
   flutter_test:
@@ -76,6 +77,7 @@ flutter:
     - assets/icons/arrow/
     - assets/icons/solid/
     - assets/icons/nav/
+    - assets/illustrations/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

@@ -40,7 +40,8 @@ class _TaskCardState extends State<TaskCard>
     super.initState();
 
     _highlightController = AnimationController(
-      duration: const Duration(milliseconds: 600),
+      // Sped up slightly for a snappier pulse
+      duration: const Duration(milliseconds: 400),
       vsync: this,
     );
 
@@ -55,6 +56,16 @@ class _TaskCardState extends State<TaskCard>
     });
 
     if (widget.isHighlighted) {
+      _highlightController.forward(from: 0.0);
+    }
+  }
+
+  // MAGIC FIX: Listen for changes from the parent (TaskList)
+  @override
+  void didUpdateWidget(TaskCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // If the card wasn't highlighted, but now it is -> fire the pulse!
+    if (widget.isHighlighted && !oldWidget.isHighlighted) {
       _highlightController.forward(from: 0.0);
     }
   }
@@ -90,9 +101,12 @@ class _TaskCardState extends State<TaskCard>
         return Container(
           margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
           decoration: BoxDecoration(
+            // Use 'value > 0' instead of 'widget.isHighlighted' so the color
+            // naturally fades out with the animation instead of snapping off.
+            // Also bumped alpha from 0.08 to 0.15 so the pulse is actually visible!
             color:
-                widget.isHighlighted
-                    ? theme.primaryColor.withValues(alpha: 0.08 * value)
+                value > 0
+                    ? theme.primaryColor.withValues(alpha: 0.15 * value)
                     : null,
             border: Border.all(
               color:
@@ -102,13 +116,14 @@ class _TaskCardState extends State<TaskCard>
               width: 1.5,
             ),
             boxShadow:
-                widget.isHighlighted
+                value > 0
                     ? [
                       BoxShadow(
+                        // Bumped alpha here too for a nice glowing effect
                         color: theme.primaryColor.withValues(
-                          alpha: 0.3 * value,
+                          alpha: 0.4 * value,
                         ),
-                        blurRadius: 8 * value,
+                        blurRadius: 12 * value,
                         spreadRadius: 2 * value,
                       ),
                     ]
@@ -116,6 +131,7 @@ class _TaskCardState extends State<TaskCard>
             borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
+            // ... THE REST OF YOUR UI REMAINS EXACTLY THE SAME ...
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (status == TaskStatus.overdue ||
@@ -217,7 +233,7 @@ class _TaskCardState extends State<TaskCard>
                               ),
                               borderRadius: BorderRadius.circular(13),
                             ),
-                            padding: EdgeInsets.symmetric(
+                            padding: const EdgeInsets.symmetric(
                               vertical: 5,
                               horizontal: 5,
                             ),
@@ -225,7 +241,7 @@ class _TaskCardState extends State<TaskCard>
                               children: [
                                 SvgPicture.asset(
                                   AppIcons.checkRoundedIcon,
-                                  colorFilter: ColorFilter.mode(
+                                  colorFilter: const ColorFilter.mode(
                                     AppPallete.successMain,
                                     BlendMode.srcIn,
                                   ),
@@ -252,7 +268,7 @@ class _TaskCardState extends State<TaskCard>
                             color: theme.dividerColor.withAlpha(30),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          padding: EdgeInsets.symmetric(
+                          padding: const EdgeInsets.symmetric(
                             vertical: 4,
                             horizontal: 7,
                           ),
@@ -260,7 +276,10 @@ class _TaskCardState extends State<TaskCard>
                             children: [
                               SvgPicture.asset(
                                 AppIcons.calendarIcon,
-                                color: theme.dividerColor,
+                                colorFilter: ColorFilter.mode(
+                                  theme.dividerColor,
+                                  BlendMode.srcIn,
+                                ),
                               ),
                               const SizedBox(width: 6),
                               Text(

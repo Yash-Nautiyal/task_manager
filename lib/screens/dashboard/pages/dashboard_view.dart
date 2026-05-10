@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:task_app/widgets/common/appBar/home_appbar.dart';
 import 'package:task_app/widgets/common/dialog/snackbar_dialog.dart';
 import 'package:task_app/widgets/common/loader/custom_loader.dart';
 import '../../../core/helpers/task_helpers.dart'
@@ -170,7 +169,6 @@ class _DashboardViewState extends State<DashboardView>
       child: Scaffold(
         extendBodyBehindAppBar: true,
         resizeToAvoidBottomInset: false,
-        appBar: HomeAppBar(theme: theme, dashboardPage: true),
         body: SafeArea(
           top: false,
           child: Stack(
