@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:task_app/models/task_model.dart';
+import 'package:task_app/screens/auth/bloc/auth_bloc.dart';
 import '../../../../models/filter_model.dart';
 import '../../bloc/dashboard_bloc.dart';
 import '../db_add_button.dart';
@@ -30,6 +31,14 @@ class HeaderSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authState = context.watch<AuthBloc>().state;
+    String userFirstName = '';
+
+    if (authState is Authenticated) {
+      final displayName = authState.user.displayName ?? '';
+      userFirstName = displayName.isNotEmpty ? displayName.split(' ')[0] : '';
+    }
+
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.symmetric(
@@ -42,10 +51,7 @@ class HeaderSection extends StatelessWidget {
               quote: quote,
               theme: theme,
               controller: controller,
-              userFirstName:
-                  user != null
-                      ? '${user?.displayName?.toString().split(' ')[0].toString()}'
-                      : '',
+              userFirstName: userFirstName,
             ),
             const SizedBox(height: 20),
             DbFilters(

@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:task_app/core/routing/app_router.dart';
 import 'package:task_app/core/theme/bloc/theme_bloc.dart';
+import 'package:task_app/screens/auth/bloc/auth_bloc.dart';
 
 import '../../../core/constants/app_icons.dart';
 
@@ -44,7 +45,7 @@ class _HomeAppBarState extends State<HomeAppBar> with TickerProviderStateMixin {
   late User? user;
   final Tween<double> turnsTween = Tween<double>(begin: 0, end: 1);
 
-  String _extractInitials() {
+  String _extractInitials(User? user) {
     final displayName = user?.displayName ?? '';
     final email = user?.email ?? '';
     final display = displayName.trim();
@@ -63,17 +64,11 @@ class _HomeAppBarState extends State<HomeAppBar> with TickerProviderStateMixin {
     return 'U';
   }
 
-  @override
-  void initState() {
-    user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      debugPrint('User display name: ${user!.displayName}');
-      debugPrint('User email: ${user!.email}');
-    } else {
-      debugPrint('No user is currently signed in.');
-    }
-    super.initState();
-  }
+  // @override
+  // void initState() {
+  //   user = FirebaseAuth.instance.currentUser;
+  //   super.initState();
+  // }
 
   @override
   void dispose() {
@@ -83,6 +78,11 @@ class _HomeAppBarState extends State<HomeAppBar> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final authState = context.watch<AuthBloc>().state;
+    User? currentUser;
+    if (authState is Authenticated) {
+      currentUser = authState.user;
+    }
     return AppBar(
       leadingWidth: widget.landingPage || widget.dashboardPage ? 90 : null,
       leading:
@@ -205,7 +205,7 @@ class _HomeAppBarState extends State<HomeAppBar> with TickerProviderStateMixin {
                         child: CircleAvatar(
                           radius: 14,
                           child: Text(
-                            _extractInitials(),
+                            _extractInitials(currentUser),
                             style: widget.theme.textTheme.bodySmall?.copyWith(
                               fontWeight: FontWeight.w700,
                               color: widget.theme.primaryColor,

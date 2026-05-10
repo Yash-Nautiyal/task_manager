@@ -28,20 +28,20 @@ class AuthService {
   Future<Result<User?>> signUpWithEmailAndPassword({
     required String email,
     required String password,
-    String? displayName,
+    required String displayName,
   }) async {
     try {
       final credential = await _withTimeout(
         _auth.createUserWithEmailAndPassword(email: email, password: password),
       );
       final user = credential.user;
-      if (user != null &&
-          displayName != null &&
-          displayName.trim().isNotEmpty) {
+      if (user != null && displayName.trim().isNotEmpty) {
         await _withTimeout(user.updateDisplayName(displayName.trim()));
         await _withTimeout(user.reload());
       }
-      return Result.success(_auth.currentUser ?? user);
+      final freshUser = _auth.currentUser;
+
+      return Result.success(freshUser);
     } on TimeoutException {
       return Result.failure(const TimeoutFailure());
     } on FirebaseAuthException catch (e) {

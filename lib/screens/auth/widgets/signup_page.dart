@@ -182,8 +182,9 @@ class _SignupPageState extends State<SignupPage> {
                               return CustomTextButton(
                                 onClick: () {
                                   if (isLoading) return;
-                                  if (!_formKey.currentState!.validate())
+                                  if (!_formKey.currentState!.validate()) {
                                     return;
+                                  }
                                   FocusScope.of(context).unfocus();
                                   context.read<AuthBloc>().add(
                                     AuthSignUpRequested(

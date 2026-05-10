@@ -81,12 +81,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     final result = await _authService.signUpWithEmailAndPassword(
       email: event.email,
       password: event.password,
-      displayName: displayName.isEmpty ? null : displayName,
+      displayName: displayName,
     );
     if (!result.isSuccess) {
       emit(AuthError(result.failure!.message));
       emit(Unauthenticated());
       return;
+    }
+
+    final user = result.data ?? _authService.currentUser;
+    if (user != null) {
+      emit(Authenticated(user));
     }
   }
 

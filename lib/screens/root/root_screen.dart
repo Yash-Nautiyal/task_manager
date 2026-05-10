@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:task_app/screens/auth/bloc/auth_bloc.dart';
 
 import '../../widgets/common/appBar/home_appbar.dart';
 import '../../widgets/common/dialog/snackbar_dialog.dart';
@@ -30,10 +31,18 @@ class _RootScreenState extends State<RootScreen> {
   late int _currentIndex;
   String? _highlightedTaskId;
   late DashboardBloc _dashboardBloc;
+  late User user;
 
   @override
   void initState() {
     super.initState();
+    user =
+        context.read<AuthBloc>().state is Authenticated
+            ? (context.read<AuthBloc>().state as Authenticated).user
+            : widget.user;
+    print(
+      'RootScreen initialized with user: ${user.uid}, displayName: ${user.displayName}',
+    );
     _currentIndex = widget.initialIndex;
     _highlightedTaskId = widget.initialHighlightTaskId;
 
@@ -59,7 +68,7 @@ class _RootScreenState extends State<RootScreen> {
   }
 
   Future<void> _refreshTasks() async {
-    _dashboardBloc.add(DashboardLoadTasksEvent(userId: widget.user.uid));
+    _dashboardBloc.add(DashboardLoadTasksEvent(userId: user.uid));
     _dashboardBloc.add(DashboardFetchQuoteEvent());
 
     try {
@@ -120,13 +129,13 @@ class _RootScreenState extends State<RootScreen> {
                   children: [
                     DashboardView(
                       onPageChanged: _onPageChanged,
-                      userId: widget.user.uid,
-                      user: widget.user,
+                      userId: user.uid,
+                      user: user,
                     ),
 
                     TaskList(
                       highlightTaskId: _highlightedTaskId,
-                      userId: widget.user.uid,
+                      userId: user.uid,
                     ),
                   ],
                 ),
