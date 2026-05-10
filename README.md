@@ -20,6 +20,7 @@ Klarity is a robust, clean, and interactive Task Manager application built with 
 
 ### 3. REST API Integration
 * **Motivational Quotes:** Integrates with `https://api.quotable.io/random` to fetch and display a random motivational Quote and Author on the dashboard.
+* **Graceful Degradation:** Free APIs occasionally experience downtime. If the API request times out or fails, the app uses a Result wrapper to safely catch the error and injects a local fallback quote so the UI remains flawless and the user experience is never interrupted.
 * **Robust Error Handling:** Uses a functional `Result` pattern to gracefully handle timeout errors or offline states without crashing the app.
 
 ### 4. UI/UX & Architecture
