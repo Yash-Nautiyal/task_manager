@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:task_app/core/error/failures.dart';
 
 import '../core/utils/result.dart';
@@ -12,7 +14,9 @@ class ApiService {
         Uri.parse('https://api.quotable.io/random'),
       );
       if (response.statusCode == 200) {
-        return Result.success(response.body);
+        final data = jsonDecode(response.body);
+        final quoteString = '"${data['content']}" - ${data['author']}';
+        return Result.success(quoteString);
       } else {
         return const Result.failure(
           AppFailure(" Failed to fetch quote. Please try again later."),

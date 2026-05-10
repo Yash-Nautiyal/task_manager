@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
         return AnimatedTheme(
           data: buildTheme(brightness: state.brightness),
           child: MaterialApp(
-            title: 'Sankar Task Manager',
+            title: 'Klarity',
             debugShowCheckedModeBanner: false,
             theme: state.themeData,
             onGenerateRoute: AppRouter.onGenerateRoute,

@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="Sankar Task Manager"
+        android:label="Klarity"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
