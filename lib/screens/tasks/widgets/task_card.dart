@@ -108,6 +108,8 @@ class _TaskCardState extends State<TaskCard>
             ? AppPallete.errorMain
             : colorOptions[widget.colorIndex % colorOptions.length];
 
+    final brightness = theme.brightness;
+    final isDark = brightness == Brightness.dark;
     return AnimatedBuilder(
       key: ValueKey(widget.task.id),
       animation: _highlightController,
@@ -115,11 +117,12 @@ class _TaskCardState extends State<TaskCard>
         final value = _highlightAnimation.value;
         return Container(
           margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+
           decoration: BoxDecoration(
             color:
                 value > 0
-                    ? taskColor.withValues(alpha: 0.1 * value)
-                    : taskColor.withValues(alpha: 0.15),
+                    ? taskColor.withValues(alpha: (isDark ? 0.55 : 0.1) * value)
+                    : taskColor.withValues(alpha: (isDark ? 0.55 : 0.15)),
             border: Border.all(
               color: taskColor.withValues(alpha: 0.02 + 0.4 * value),
               width: 1.5,

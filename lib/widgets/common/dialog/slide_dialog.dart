@@ -1,9 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
-import '../../../core/constants/app_icons.dart';
 import '../../../core/theme/app_pallete.dart';
 
 class SlideDialog extends StatefulWidget {
@@ -35,7 +33,7 @@ class _SlideDialogState extends State<SlideDialog>
   late AnimationController _animationController;
   late Animation<Offset> _slideAnimation;
 
-  bool _showDropdown = false;
+  // bool _showDropdown = false;
 
   @override
   void initState() {
@@ -152,18 +150,18 @@ class _SlideDialogState extends State<SlideDialog>
                                               color: widget.theme.disabledColor,
                                             ),
                                           ),
-                                        if (widget.isProfile == true)
-                                          IconButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                _showDropdown = !_showDropdown;
-                                              });
-                                            },
-                                            icon: Icon(
-                                              Icons.more_vert,
-                                              color: widget.theme.disabledColor,
-                                            ),
-                                          ),
+                                        // if (widget.isProfile == true)
+                                        //   IconButton(
+                                        //     onPressed: () {
+                                        //       setState(() {
+                                        //         _showDropdown = !_showDropdown;
+                                        //       });
+                                        //     },
+                                        //     icon: Icon(
+                                        //       Icons.more_vert,
+                                        //       color: widget.theme.disabledColor,
+                                        //     ),
+                                        //   ),
                                         IconButton(
                                           onPressed: _closeDialog,
                                           icon: Icon(
@@ -177,49 +175,49 @@ class _SlideDialogState extends State<SlideDialog>
                                     Expanded(child: widget.child),
                                   ],
                                 ),
-                                Positioned(
-                                  top: _showDropdown ? 10 : 30,
-                                  right: 30,
-                                  child: AnimatedSlide(
-                                    offset:
-                                        _showDropdown
-                                            ? Offset(0, .5)
-                                            : Offset(0, 0),
-                                    duration: const Duration(milliseconds: 250),
-                                    curve: Curves.easeOut,
-                                    child: AnimatedOpacity(
-                                      opacity: _showDropdown ? 1 : 0,
-                                      duration: const Duration(
-                                        milliseconds: 250,
-                                      ),
-                                      child: Container(
-                                        margin: const EdgeInsets.only(top: 12),
-                                        padding: const EdgeInsets.all(10),
-                                        child: GestureDetector(
-                                          onTap: () => {},
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              SvgPicture.asset(
-                                                AppIcons.trashBoldIcon,
-                                                color: Colors.red,
-                                              ),
-                                              const SizedBox(width: 8),
-                                              Text(
-                                                "Delete",
-                                                style: TextStyle(
-                                                  color: Colors.red,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                              ),
-                                              const SizedBox(width: 8),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                                // Positioned(
+                                //   top: _showDropdown ? 10 : 30,
+                                //   right: 30,
+                                //   child: AnimatedSlide(
+                                //     offset:
+                                //         _showDropdown
+                                //             ? Offset(0, .5)
+                                //             : Offset(0, 0),
+                                //     duration: const Duration(milliseconds: 250),
+                                //     curve: Curves.easeOut,
+                                //     child: AnimatedOpacity(
+                                //       opacity: _showDropdown ? 1 : 0,
+                                //       duration: const Duration(
+                                //         milliseconds: 250,
+                                //       ),
+                                //       child: Container(
+                                //         margin: const EdgeInsets.only(top: 12),
+                                //         padding: const EdgeInsets.all(10),
+                                //         child: GestureDetector(
+                                //           onTap: () => {},
+                                //           child: Row(
+                                //             mainAxisSize: MainAxisSize.min,
+                                //             children: [
+                                //               SvgPicture.asset(
+                                //                 AppIcons.trashBoldIcon,
+                                //                 color: Colors.red,
+                                //               ),
+                                //               const SizedBox(width: 8),
+                                //               Text(
+                                //                 "Delete",
+                                //                 style: TextStyle(
+                                //                   color: Colors.red,
+                                //                   fontWeight: FontWeight.w600,
+                                //                 ),
+                                //               ),
+                                //               const SizedBox(width: 8),
+                                //             ],
+                                //           ),
+                                //         ),
+                                //       ),
+                                //     ),
+                                //   ),
+                                // ),
                               ],
                             ),
                           ),

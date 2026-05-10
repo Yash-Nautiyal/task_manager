@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:task_app/core/constants/app_icons.dart';
 import 'package:task_app/core/helpers/date_time_helper.dart';
 import 'package:task_app/core/helpers/task_helpers.dart';
+import 'package:task_app/core/theme/app_pallete.dart';
 import 'package:task_app/models/task_model.dart';
 
 class TaskCardFooter extends StatelessWidget {
@@ -18,6 +19,8 @@ class TaskCardFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
+    final isDark = brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Wrap(
@@ -30,8 +33,8 @@ class TaskCardFooter extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  status.color.withValues(alpha: 0.9),
-                  status.color.withValues(alpha: 0.6),
+                  status.color.withValues(alpha: (!isDark ? 0.9 : 0.6)),
+                  status.color.withValues(alpha: (!isDark ? 0.6 : 0.3)),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -40,16 +43,17 @@ class TaskCardFooter extends StatelessWidget {
             ),
             child: Text(
               status.text,
-              style: theme.textTheme.labelMedium?.copyWith(
-                color: theme.scaffoldBackgroundColor,
-              ),
+              style: theme.textTheme.labelMedium?.copyWith(color: Colors.white),
             ),
           ),
 
           Container(
             height: 30,
             decoration: BoxDecoration(
-              color: theme.dividerColor.withAlpha(30),
+              color:
+                  isDark
+                      ? AppPallete.white.withAlpha(50)
+                      : theme.dividerColor.withAlpha(30),
               borderRadius: BorderRadius.circular(10),
             ),
             padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 7),
@@ -59,7 +63,7 @@ class TaskCardFooter extends StatelessWidget {
                 SvgPicture.asset(
                   AppIcons.calendarIcon,
                   colorFilter: ColorFilter.mode(
-                    theme.dividerColor,
+                    isDark ? Colors.white : theme.dividerColor,
                     BlendMode.srcIn,
                   ),
                 ),

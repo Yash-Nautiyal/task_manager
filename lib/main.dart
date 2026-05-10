@@ -51,7 +51,7 @@ class MyApp extends StatelessWidget {
           child: MaterialApp(
             title: 'Sankar Task Manager',
             debugShowCheckedModeBanner: false,
-            theme: AppTheme.lightTheme,
+            theme: state.themeData,
             onGenerateRoute: AppRouter.onGenerateRoute,
             home: BlocBuilder<AuthBloc, AuthState>(
               builder: (context, state) {

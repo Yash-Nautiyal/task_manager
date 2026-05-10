@@ -35,6 +35,7 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
             : Brightness.dark;
     _prefs.setBool('theme_isDark', newBrightness == Brightness.dark);
     final newTheme = buildTheme(brightness: newBrightness);
+    print('Brightness toggled to $newBrightness');
     emit(state.copyWith(themeData: newTheme, brightness: newBrightness));
   }
 }

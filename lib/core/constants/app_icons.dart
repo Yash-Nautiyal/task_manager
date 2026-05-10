@@ -34,4 +34,6 @@ class AppIcons {
   static const String searchFillIcon = '$_basePath/ic-eva_search-fill.svg';
   static const String calendarIcon = '$_basePath/ic-calender.svg';
   static const String settingIcon = '$_basePath/ic-settings.svg';
+  static const String sunIcon = '$_basePath/ic-sun.svg';
+  static const String moonIcon = '$_basePath/ic-moon.svg';
 }

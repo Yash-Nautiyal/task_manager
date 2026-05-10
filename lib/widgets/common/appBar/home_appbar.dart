@@ -2,8 +2,10 @@ import 'dart:ui';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:task_app/core/routing/app_router.dart';
+import 'package:task_app/core/theme/bloc/theme_bloc.dart';
 
 import '../../../core/constants/app_icons.dart';
 
@@ -155,16 +157,16 @@ class _HomeAppBarState extends State<HomeAppBar> with TickerProviderStateMixin {
           icon: RotationTransition(
             turns: turnsTween.animate(_controller),
             child: SvgPicture.asset(
-              AppIcons.settingIcon,
-              colorFilter: ColorFilter.mode(
-                widget.theme.disabledColor,
-                BlendMode.srcIn,
-              ),
+              Brightness.dark == Theme.of(context).brightness
+                  ? AppIcons.moonIcon
+                  : AppIcons.sunIcon,
+
               width: 24,
               height: 24,
             ),
           ),
-          onPressed: () => AppRouter.showSettingsModal(context),
+          onPressed:
+              () => context.read<ThemeBloc>().add(ToggleBrightnessEvent()),
         ),
         if (widget.dashboardPage)
           GestureDetector(
