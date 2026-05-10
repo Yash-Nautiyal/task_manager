@@ -119,6 +119,7 @@ class _RootScreenState extends State<RootScreen> {
               appBar: HomeAppBar(
                 theme: theme,
                 dashboardPage: true,
+                showBackButton: false,
                 currentIndex: _currentIndex,
                 onPageChanged: _onPageChanged,
               ),

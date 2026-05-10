@@ -17,6 +17,7 @@ class HomeAppBar extends StatefulWidget implements PreferredSizeWidget {
   final bool landingPage;
   final Function? onPressed;
   final int currentIndex;
+  final bool showBackButton;
   final Function(int, String?)? onPageChanged;
   const HomeAppBar({
     super.key,
@@ -27,6 +28,7 @@ class HomeAppBar extends StatefulWidget implements PreferredSizeWidget {
     this.onPressed,
     this.currentIndex = 0,
     this.onPageChanged,
+    this.showBackButton = true,
   });
 
   @override
@@ -86,7 +88,9 @@ class _HomeAppBarState extends State<HomeAppBar> with TickerProviderStateMixin {
     return AppBar(
       leadingWidth: widget.landingPage || widget.dashboardPage ? 90 : null,
       leading:
-          Navigator.canPop(context)
+          (widget.showBackButton &&
+                  !widget.landingPage &&
+                  Navigator.canPop(context))
               ? IconButton(
                 icon: Icon(
                   Icons.arrow_back,

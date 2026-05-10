@@ -15,6 +15,7 @@ class TaskSection extends StatelessWidget {
   final Function showAddTaskDialog;
   final AnimationController expandController;
   final Function(String taskId, bool value) completeTask;
+  final Function(String taskId) onDeleteTask;
   const TaskSection({
     super.key,
     required this.theme,
@@ -28,6 +29,7 @@ class TaskSection extends StatelessWidget {
     required this.showAddTaskDialog,
     required this.expandController,
     required this.completeTask,
+    required this.onDeleteTask,
   });
 
   @override
@@ -48,7 +50,7 @@ class TaskSection extends StatelessWidget {
               expandController: expandController,
               showAddTaskDialog:
                   (task) => showAddTaskDialog(task: task, isEdit: true),
-              onDeleteTask: (taskId) async {},
+              onDeleteTask: (taskId) => onDeleteTask(taskId),
               onCompleteTask: (taskId, value) => completeTask(taskId, value),
             ),
           );

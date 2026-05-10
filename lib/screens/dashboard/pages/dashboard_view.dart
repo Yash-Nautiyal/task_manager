@@ -254,6 +254,14 @@ class _DashboardViewState extends State<DashboardView>
                               ),
                             );
                           },
+                          onDeleteTask: (taskId) {
+                            context.read<DashboardBloc>().add(
+                              DashboardDeleteTaskEvent(
+                                userId: widget.userId,
+                                taskId: taskId,
+                              ),
+                            );
+                          },
                         ),
                         // Charts Section (Stationary)
                         ChartSection(

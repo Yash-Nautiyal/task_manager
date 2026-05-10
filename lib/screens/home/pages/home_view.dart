@@ -46,6 +46,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
       appBar: HomeAppBar(
         theme: theme,
         landingPage: true,
+        showBackButton: false,
         onPressed: () => AppRouter.pushAuth(context),
       ),
       extendBodyBehindAppBar: true,
