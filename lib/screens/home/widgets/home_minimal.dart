@@ -32,7 +32,7 @@ class HomeMinimal extends StatelessWidget {
                 style: theme.textTheme.displayMedium?.copyWith(fontSize: 28),
               ),
               Text(
-                "2D00?",
+                "Klarity?",
                 style: theme.textTheme.displayMedium?.copyWith(
                   fontSize: 28,
                   foreground:

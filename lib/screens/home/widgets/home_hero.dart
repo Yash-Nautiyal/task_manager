@@ -35,7 +35,7 @@ class HomeHero extends StatelessWidget {
                   // Subtitle
                   const SizedBox(height: 24),
                   Text(
-                    'Minimalistic and lightweight, it helps you stay focused and get things done. Remove all the complex todo applications fuss and try out 2DOO today for free!',
+                    'Minimalistic and lightweight, it helps you stay focused and get things done. Remove all the complex todo applications fuss and try out Klarity today for free!',
                     textAlign: TextAlign.center,
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w500,

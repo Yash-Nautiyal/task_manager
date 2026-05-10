@@ -50,7 +50,7 @@ class _HeroTitleState extends State<HeroTitle>
         Text('with', style: widget.theme.textTheme.displayMedium),
 
         AnimatedGradientText(
-          text: '2D00',
+          text: 'Klarity',
           colors: const [
             AppPallete.primaryMain,
             AppPallete.warningMain,
