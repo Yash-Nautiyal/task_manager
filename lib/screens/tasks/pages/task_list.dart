@@ -299,7 +299,7 @@ class _TaskListState extends State<TaskList> {
                                       key: ValueKey('task_${task.id}'),
                                       grid: grid,
                                       task: task,
-                                      colorIndex: index,
+                                      // colorIndex: index,
                                       isHighlighted:
                                           task.id == _highlightedTaskId,
                                       onCompleteTask: (value) {

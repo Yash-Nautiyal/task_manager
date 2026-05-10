@@ -204,9 +204,7 @@ class _TaskCardState extends State<TaskCard>
               //Description
               if (widget.task.description.isNotEmpty) ...[
                 Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                  ).copyWith(bottom: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Text(
                     widget.task.description,
                     style: theme.textTheme.bodyMedium,

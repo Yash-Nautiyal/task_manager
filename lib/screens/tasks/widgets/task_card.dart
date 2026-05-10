@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:task_app/core/theme/app_pallete.dart';
 import 'package:task_app/models/task_model.dart';
@@ -13,7 +15,7 @@ class TaskCard extends StatefulWidget {
   final VoidCallback onDelete;
   final bool isHighlighted;
   final bool grid;
-  final int colorIndex;
+
   const TaskCard({
     super.key,
     required this.task,
@@ -22,7 +24,6 @@ class TaskCard extends StatefulWidget {
     required this.onDelete,
     this.grid = false,
     this.isHighlighted = false,
-    required this.colorIndex,
   });
 
   @override
@@ -31,25 +32,33 @@ class TaskCard extends StatefulWidget {
 
 class _TaskCardState extends State<TaskCard>
     with SingleTickerProviderStateMixin {
-  late AnimationController _highlightController;
-  late Animation<double> _highlightAnimation;
+  late final AnimationController _highlightController;
+  late final Animation<double> _highlightAnimation;
 
   final GlobalKey _popupAnchorKey = GlobalKey();
   final LayerLink _layerLink = LayerLink();
   final ResponsivePopupController _popupController =
       ResponsivePopupController();
 
+  static const List<Color> _palette = [
+    AppPallete.infoMain,
+    AppPallete.warningMain,
+    AppPallete.primaryMain,
+    AppPallete.secondaryMain,
+  ];
+
   @override
   void initState() {
     super.initState();
 
     _highlightController = AnimationController(
-      duration: const Duration(milliseconds: 400),
+      duration: const Duration(milliseconds: 700),
       vsync: this,
     );
 
-    _highlightAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _highlightController, curve: Curves.easeInOut),
+    _highlightAnimation = CurvedAnimation(
+      parent: _highlightController,
+      curve: Curves.easeInOut,
     );
 
     _highlightController.addStatusListener((status) {
@@ -78,22 +87,23 @@ class _TaskCardState extends State<TaskCard>
   }
 
   void _deleteTask() async {
-    bool confirm = await showDeleteDialog(context, 'task');
-    if (confirm) {
-      widget.onDelete.call();
-    }
+    final confirmed = await showDeleteDialog(context, 'task');
+    if (confirmed) widget.onDelete();
   }
 
-  List<Color> colorOptions = [
-    AppPallete.infoMain,
-    AppPallete.warningMain,
-    AppPallete.primaryMain,
-    AppPallete.secondaryMain,
-  ];
+  Color _accentColor(TaskStatus status) {
+    return switch (status) {
+      TaskStatus.completed => AppPallete.successMain,
+      TaskStatus.overdue => AppPallete.errorMain,
+      _ => _palette[widget.task.id.hashCode.abs() % _palette.length],
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     final status =
         widget.task.status == TaskStatus.completed
             ? TaskStatus.completed
@@ -101,78 +111,113 @@ class _TaskCardState extends State<TaskCard>
             ? TaskStatus.overdue
             : TaskStatus.todo;
 
-    final Color taskColor =
-        (status == TaskStatus.completed)
-            ? AppPallete.successMain
-            : (status == TaskStatus.overdue)
-            ? AppPallete.errorMain
-            : colorOptions[widget.colorIndex % colorOptions.length];
+    final accent = _accentColor(status);
 
-    final brightness = theme.brightness;
-    final isDark = brightness == Brightness.dark;
+    final cardSurface =
+        isDark
+            ? Color.alphaBlend(
+              Colors.white.withOpacity(0.05),
+              theme.scaffoldBackgroundColor,
+            )
+            : Colors.white;
+
     return AnimatedBuilder(
       key: ValueKey(widget.task.id),
-      animation: _highlightController,
-      builder: (context, child) {
-        final value = _highlightAnimation.value;
+      animation: _highlightAnimation,
+      builder: (context, _) {
+        final glow = _highlightAnimation.value;
+
         return Container(
-          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-
+          margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
           decoration: BoxDecoration(
-            color:
-                value > 0
-                    ? taskColor.withValues(alpha: (isDark ? 0.55 : 0.1) * value)
-                    : taskColor.withValues(alpha: (isDark ? 0.55 : 0.15)),
+            color: cardSurface,
+            borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: taskColor.withValues(alpha: 0.02 + 0.4 * value),
-              width: 1.5,
+              color:
+                  isDark
+                      ? Colors.white.withOpacity(0.08 + 0.22 * glow)
+                      : Colors.black.withOpacity(0.07 + 0.10 * glow),
+              width: 1,
             ),
-            boxShadow:
-                value > 0
-                    ? [
-                      BoxShadow(
-                        color: theme.primaryColor.withValues(
-                          alpha: 0.4 * value,
-                        ),
-                        blurRadius: 12 * value,
-                        spreadRadius: 2 * value,
-                      ),
-                    ]
-                    : null,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              //CheckBox
-              TaskCardHeader(
-                status: status,
-                title: widget.task.title,
-                theme: theme,
-                popupAnchorKey: _popupAnchorKey,
-                layerLink: _layerLink,
-                popupController: _popupController,
-                onEdit: widget.onEdit,
-                onCompleteTask: (value) => widget.onCompleteTask(value),
-                onDelete: _deleteTask,
+            boxShadow: [
+              BoxShadow(
+                color:
+                    isDark
+                        ? Colors.black.withOpacity(0.40)
+                        : Colors.black.withOpacity(0.07),
+                blurRadius: 10,
+                offset: const Offset(0, 2),
               ),
-              //Description
-              if (widget.task.description.isNotEmpty) ...[
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text(
-                    widget.task.description,
-                    style: theme.textTheme.bodyMedium,
-                  ),
+              if (glow > 0)
+                BoxShadow(
+                  color: accent.withOpacity(0.50 * glow),
+                  blurRadius: 20 * glow,
+                  spreadRadius: 1 * glow,
                 ),
-              ],
-
-              TaskCardFooter(
-                status: status,
-                theme: theme,
-                dueDate: widget.task.dueDate,
-              ),
             ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(13),
+            child: IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    width: 4,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [accent, accent.withOpacity(0.55)],
+                      ),
+                    ),
+                  ),
+
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TaskCardHeader(
+                          status: status,
+                          title: widget.task.title,
+                          theme: theme,
+                          popupAnchorKey: _popupAnchorKey,
+                          layerLink: _layerLink,
+                          popupController: _popupController,
+                          onEdit: widget.onEdit,
+                          onCompleteTask:
+                              (value) => widget.onCompleteTask(value),
+                          onDelete: _deleteTask,
+                        ),
+
+                        if (widget.task.description.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(12, 0, 16, 8),
+                            child: Text(
+                              widget.task.description,
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: theme.colorScheme.onSurface.withOpacity(
+                                  0.55,
+                                ),
+                                height: 1.45,
+                              ),
+                            ),
+                          ),
+
+                        TaskCardFooter(
+                          status: status,
+                          theme: theme,
+                          dueDate: widget.task.dueDate,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         );
       },

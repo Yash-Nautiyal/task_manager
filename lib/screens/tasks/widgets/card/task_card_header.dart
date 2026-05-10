@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:task_app/core/constants/app_icons.dart';
 import 'package:task_app/core/theme/app_pallete.dart';
@@ -10,14 +12,13 @@ class TaskCardHeader extends StatelessWidget {
   final TaskStatus status;
   final String title;
   final ThemeData theme;
-
   final GlobalKey popupAnchorKey;
   final LayerLink layerLink;
   final ResponsivePopupController popupController;
-
   final VoidCallback onEdit;
   final Function(bool) onCompleteTask;
   final VoidCallback onDelete;
+
   const TaskCardHeader({
     super.key,
     required this.status,
@@ -33,34 +34,60 @@ class TaskCardHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = theme.brightness == Brightness.dark;
+    final isCompleted = status == TaskStatus.completed;
+
+    final titleColor =
+        isCompleted
+            ? (isDark
+                ? AppPallete.successMain.withOpacity(0.65)
+                : AppPallete.successMain)
+            : (isDark
+                ? Colors.white.withOpacity(0.88)
+                : theme.colorScheme.onSurface);
+
+    final moreIconColor =
+        isDark
+            ? Colors.white.withOpacity(0.38)
+            : Colors.black.withOpacity(0.30);
+
     return Padding(
-      padding: EdgeInsets.only(right: 16.0),
+      padding: const EdgeInsets.only(right: 4),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Checkbox(
-            value: status == TaskStatus.completed,
-            activeColor: AppPallete.successMain,
-            checkColor: AppPallete.white,
-            onChanged: (value) {
-              onCompleteTask(value!);
-            },
+          Transform.scale(
+            scale: 0.88,
+            child: Checkbox(
+              value: isCompleted,
+              activeColor: AppPallete.successMain,
+              checkColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5),
+              ),
+              side: BorderSide(
+                color:
+                    isDark
+                        ? Colors.white.withOpacity(0.28)
+                        : Colors.black.withOpacity(0.22),
+                width: 1.5,
+              ),
+              onChanged: (value) => onCompleteTask(value!),
+            ),
           ),
+
           Expanded(
             child: Text(
               title,
-              overflow: TextOverflow.ellipsis,
               maxLines: 3,
+              overflow: TextOverflow.ellipsis,
               style: theme.textTheme.titleMedium?.copyWith(
-                decoration:
-                    status == TaskStatus.completed
-                        ? TextDecoration.lineThrough
-                        : null,
-                color:
-                    status == TaskStatus.completed
-                        ? AppPallete.successMain
-                        : null,
+                color: titleColor,
+                fontWeight: FontWeight.w600,
+                height: 1.3,
+                decoration: isCompleted ? TextDecoration.lineThrough : null,
+                decorationColor: AppPallete.successMain.withOpacity(0.65),
+                decorationThickness: 1.8,
               ),
             ),
           ),
@@ -68,14 +95,14 @@ class TaskCardHeader extends StatelessWidget {
           Popup(
             popupAnchorKey: popupAnchorKey,
             layerLink: layerLink,
-            icon: const Icon(Icons.more_vert),
+            icon: Icon(Icons.more_vert, size: 20, color: moreIconColor),
             popupController: popupController,
-            manualOffset: Offset(-16, 0),
+            manualOffset: const Offset(-16, 0),
             arrowOffset: 0.75,
             preferredPosition: PopupPreferredPosition.bottom,
             items: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                padding: const EdgeInsets.symmetric(horizontal: 5),
                 child: ResponsivePopupItem(
                   title: 'Edit',
                   svgIcon: AppIcons.penBoldIcon,
@@ -87,7 +114,7 @@ class TaskCardHeader extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                padding: const EdgeInsets.symmetric(horizontal: 5),
                 child: DestructivePopupItem(
                   onTap: onDelete,
                   popupController: popupController,
