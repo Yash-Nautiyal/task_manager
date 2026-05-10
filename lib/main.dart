@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:task_app/core/theme/bloc/theme_bloc.dart';
 import 'package:task_app/firebase_options.dart';
 import 'package:task_app/screens/auth/bloc/auth_bloc.dart';
 import 'package:task_app/screens/root/root_screen.dart';
@@ -19,9 +20,13 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
+  final themeBloc = await ThemeBloc.create();
+
   runApp(
     MultiBlocProvider(
       providers: [
+        BlocProvider.value(value: themeBloc),
+
         BlocProvider<AuthBloc>(
           create:
               (_) =>
@@ -39,24 +44,31 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Sankar Task Manager',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      onGenerateRoute: AppRouter.onGenerateRoute,
-      home: BlocBuilder<AuthBloc, AuthState>(
-        builder: (context, state) {
-          if (state is AuthInitial || state is AuthLoading) {
-            return const Scaffold(body: CustomLoader());
-          }
+    return BlocBuilder<ThemeBloc, ThemeState>(
+      builder: (context, state) {
+        return AnimatedTheme(
+          data: buildTheme(brightness: state.brightness),
+          child: MaterialApp(
+            title: 'Sankar Task Manager',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.lightTheme,
+            onGenerateRoute: AppRouter.onGenerateRoute,
+            home: BlocBuilder<AuthBloc, AuthState>(
+              builder: (context, state) {
+                if (state is AuthInitial || state is AuthLoading) {
+                  return const Scaffold(body: CustomLoader());
+                }
 
-          if (state is Authenticated) {
-            return RootScreen(user: state.user); 
-          }
+                if (state is Authenticated) {
+                  return RootScreen(user: state.user);
+                }
 
-          return const HomeView();
-        },
-      ),
+                return const HomeView();
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 }

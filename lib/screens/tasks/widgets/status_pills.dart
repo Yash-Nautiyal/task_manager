@@ -26,9 +26,9 @@ class StatusPill extends StatelessWidget {
         decoration: BoxDecoration(
           color:
               isSelected
-                  ? theme.primaryColor
-                  : theme.dividerColor.withAlpha(15),
-          borderRadius: BorderRadius.circular(24),
+                  ? theme.dividerColor.withAlpha(65)
+                  : theme.dividerColor.withAlpha(25),
+          borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -38,8 +38,8 @@ class StatusPill extends StatelessWidget {
               style: theme.textTheme.labelLarge?.copyWith(
                 color:
                     isSelected
-                        ? theme.colorScheme.onPrimary
-                        : theme.colorScheme.onSurface,
+                        ? theme.colorScheme.tertiary
+                        : theme.dividerColor.withValues(alpha: 0.5),
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
               ),
             ),
@@ -49,17 +49,17 @@ class StatusPill extends StatelessWidget {
               decoration: BoxDecoration(
                 color:
                     isSelected
-                        ? theme.colorScheme.onPrimary.withAlpha(50)
+                        ? theme.scaffoldBackgroundColor
                         : theme.cardColor,
-                borderRadius: BorderRadius.circular(12),
+                shape: BoxShape.circle,
               ),
               child: Text(
                 count.toString(),
                 style: theme.textTheme.labelSmall?.copyWith(
                   color:
                       isSelected
-                          ? theme.colorScheme.onPrimary
-                          : theme.colorScheme.onSurface,
+                          ? theme.colorScheme.tertiary
+                          : theme.dividerColor.withValues(alpha: 0.5),
                   fontWeight: FontWeight.bold,
                 ),
               ),

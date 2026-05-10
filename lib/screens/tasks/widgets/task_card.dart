@@ -13,7 +13,7 @@ class TaskCard extends StatefulWidget {
   final VoidCallback onDelete;
   final bool isHighlighted;
   final bool grid;
-
+  final int colorIndex;
   const TaskCard({
     super.key,
     required this.task,
@@ -22,6 +22,7 @@ class TaskCard extends StatefulWidget {
     required this.onDelete,
     this.grid = false,
     this.isHighlighted = false,
+    required this.colorIndex,
   });
 
   @override
@@ -100,13 +101,12 @@ class _TaskCardState extends State<TaskCard>
             ? TaskStatus.overdue
             : TaskStatus.todo;
 
-    final int colorIndex = widget.task.id.hashCode.abs() % colorOptions.length;
     final Color taskColor =
         (status == TaskStatus.completed)
             ? AppPallete.successMain
             : (status == TaskStatus.overdue)
             ? AppPallete.errorMain
-            : colorOptions[colorIndex];
+            : colorOptions[widget.colorIndex % colorOptions.length];
 
     return AnimatedBuilder(
       key: ValueKey(widget.task.id),

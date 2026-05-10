@@ -309,10 +309,10 @@ class _TaskListState extends State<TaskList> {
                                   itemBuilder: (context, index) {
                                     final task = finalTasksToDisplay[index];
                                     return TaskCard(
-                                      // ... Your existing TaskCard configuration ...
-                                      grid: grid,
                                       key: ValueKey('task_${task.id}'),
+                                      grid: grid,
                                       task: task,
+                                      colorIndex: index,
                                       isHighlighted:
                                           task.id == _highlightedTaskId,
                                       onCompleteTask: (value) {
