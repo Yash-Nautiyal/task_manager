@@ -30,6 +30,28 @@ Klarity is a robust, clean, and interactive Task Manager application built with 
 
 ---
 
+## 🛠️ Setup & Installation Instructions
+
+Follow these steps to run the application locally on your machine.
+
+### Prerequisites
+* Flutter SDK (Version 3.19.0 or higher recommended)
+* Dart SDK
+* Android Studio / Xcode for emulators
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/Yash-Nautiyal/task_manager.git
+```
+### 2. Get depenecies
+```bash
+cd task_app
+```
+### 3. Run Project
+```bash
+flutter pub get
+```
+
 ## 📂 Folder Structure
 
 The project strictly follows a feature-driven clean architecture structure:
@@ -49,3 +71,4 @@ lib/
  ┃ ┗ firestore_service.dart # Cloud Firestore implementation
  ┣ widgets/           # Reusable global UI components (Buttons, Loaders, Dialogs)
  ┗ main.dart          # Entry point and multi-bloc initialization
+ ```
