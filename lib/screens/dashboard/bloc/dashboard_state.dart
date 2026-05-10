@@ -29,6 +29,7 @@ class DashboardState extends Equatable {
   final FilterModel currentFilters;
   final String? highlightedTaskId;
   final int currentTaskIndex;
+  final TaskListStatusFilter taskListStatusFilter;
 
   const DashboardState({
     this.status = DashboardStatus.initial,
@@ -41,6 +42,7 @@ class DashboardState extends Equatable {
     this.currentFilters = const FilterModel(),
     this.currentTaskIndex = 0,
     this.highlightedTaskId,
+    this.taskListStatusFilter = TaskListStatusFilter.all,
   });
 
   @override
@@ -55,6 +57,7 @@ class DashboardState extends Equatable {
     currentFilters,
     highlightedTaskId,
     currentTaskIndex,
+    taskListStatusFilter,
   ];
 
   DashboardState copyWith({
@@ -68,6 +71,7 @@ class DashboardState extends Equatable {
     FilterModel? currentFilters,
     int? currentTaskIndex,
     String? highlightedTaskId,
+    TaskListStatusFilter? taskListStatusFilter,
   }) {
     return DashboardState(
       status: status ?? this.status,
@@ -80,6 +84,7 @@ class DashboardState extends Equatable {
       currentFilters: currentFilters ?? this.currentFilters,
       currentTaskIndex: currentTaskIndex ?? this.currentTaskIndex,
       highlightedTaskId: highlightedTaskId ?? this.highlightedTaskId,
+      taskListStatusFilter: taskListStatusFilter ?? this.taskListStatusFilter,
     );
   }
 }

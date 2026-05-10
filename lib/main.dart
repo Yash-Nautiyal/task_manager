@@ -51,7 +51,7 @@ class MyApp extends StatelessWidget {
           }
 
           if (state is Authenticated) {
-            return RootScreen(user: state.user); // Pass it here!
+            return RootScreen(user: state.user); 
           }
 
           return const HomeView();

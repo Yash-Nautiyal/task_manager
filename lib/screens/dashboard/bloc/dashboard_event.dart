@@ -90,3 +90,12 @@ class DashboardUpdateTaskStatusEvent extends DashboardEvent {
 }
 
 class DashboardFetchQuoteEvent extends DashboardEvent {}
+
+class DashboardUpdateTaskListStatusFilterEvent extends DashboardEvent {
+  final TaskListStatusFilter statusFilter;
+
+  const DashboardUpdateTaskListStatusFilterEvent(this.statusFilter);
+
+  @override
+  List<Object?> get props => [statusFilter];
+}

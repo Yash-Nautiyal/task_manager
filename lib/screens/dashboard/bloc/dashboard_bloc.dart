@@ -31,6 +31,9 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     on<DashboardUpdateTaskStatusEvent>(_onUpdateTaskStatus);
     on<_DashboardTasksChanged>(_onTasksChanged);
     on<DashboardFetchQuoteEvent>(_onFetchQuote);
+    on<DashboardUpdateTaskListStatusFilterEvent>(
+      _onTaskListStatusFilterChanged,
+    );
   }
 
   final FirestoreService _firestoreService;
@@ -327,6 +330,13 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     Emitter<DashboardState> emit,
   ) {
     emit(state.copyWith(taskListFilters: event.filters));
+  }
+
+  FutureOr<void> _onTaskListStatusFilterChanged(
+    DashboardUpdateTaskListStatusFilterEvent event,
+    Emitter<DashboardState> emit,
+  ) {
+    emit(state.copyWith(taskListStatusFilter: event.statusFilter));
   }
 }
 

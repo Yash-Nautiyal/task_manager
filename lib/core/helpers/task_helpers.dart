@@ -137,3 +137,18 @@ List<Task> applyFilters(
 
   return filtered;
 }
+
+enum TaskListStatusFilter { all, todo, overdue, completed }
+
+List<Task> applyStatusFilter(List<Task> tasks, TaskListStatusFilter filter) {
+  switch (filter) {
+    case TaskListStatusFilter.all:
+      return tasks;
+    case TaskListStatusFilter.completed:
+      return tasks.where((t) => t.status == TaskStatus.completed).toList();
+    case TaskListStatusFilter.overdue:
+      return tasks.where((t) => t.isOverdue).toList();
+    case TaskListStatusFilter.todo:
+      return tasks.where((t) => t.status != TaskStatus.completed && !t.isOverdue).toList();
+  }
+}

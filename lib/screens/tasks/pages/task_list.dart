@@ -11,7 +11,8 @@ import '../../dashboard/widgets/db_add_button.dart';
 import '../../dashboard/widgets/db_filters.dart';
 import '../../dashboard/widgets/dialogs/add_task_dialog.dart';
 import '../../dashboard/widgets/empty_tasks.dart';
-import '../../dashboard/widgets/task_card.dart';
+import '../widgets/status_pills.dart';
+import '../widgets/task_card.dart';
 
 class TaskList extends StatefulWidget {
   final String userId;
@@ -64,7 +65,7 @@ class _TaskListState extends State<TaskList> {
       (task) => task.id == _highlightedTaskId,
     );
     if (taskIndex != -1) {
-      _hasHighlighted = true; // Prevent endless scrolling loops
+      _hasHighlighted = true;
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _observerController
@@ -72,11 +73,10 @@ class _TaskListState extends State<TaskList> {
               index: taskIndex,
               duration: const Duration(milliseconds: 500),
               curve: Curves.easeInOut,
-              offset: (targetOffset) => 100, // Header buffer
+              offset: (targetOffset) => 100,
             )
             .then((_) {
               if (!mounted) return;
-              // Clear highlight after 1.5 seconds
               Future.delayed(const Duration(milliseconds: 1500), () {
                 if (mounted) setState(() => _highlightedTaskId = null);
               });
@@ -129,7 +129,6 @@ class _TaskListState extends State<TaskList> {
 
     return Stack(
       children: [
-        // 1. The Side-Effect Listener
         BlocListener<DashboardBloc, DashboardState>(
           listenWhen:
               (previous, current) =>
@@ -153,32 +152,52 @@ class _TaskListState extends State<TaskList> {
               _triggerConfetti();
             }
           },
-          // 2. The Main UI Builder
           child: BlocBuilder<DashboardBloc, DashboardState>(
             buildWhen:
                 (previous, current) =>
                     previous.status != current.status ||
                     previous.alltasks != current.alltasks ||
-                    previous.taskListFilters != current.taskListFilters,
+                    previous.taskListFilters != current.taskListFilters ||
+                    previous.taskListStatusFilter !=
+                        current.taskListStatusFilter,
             builder: (context, state) {
               if (state.status == DashboardStatus.loading) {
                 return const Center(child: CircularProgressIndicator());
               }
 
               if (state.status == DashboardStatus.loaded) {
-                // Apply the independent filters specifically meant for this tab
                 final sortedTasks = getSortedTasks(state.alltasks);
-                final filteredTasks = applyFilters(
+                final baseFilteredTasks = applyFilters(
                   sortedTasks,
                   state.taskListFilters,
                   applyTabFilter: false,
                 );
-                _highlightAndScrollToTask(filteredTasks);
+
+                final allCount = baseFilteredTasks.length;
+                final todoCount =
+                    baseFilteredTasks
+                        .where(
+                          (t) =>
+                              t.status != TaskStatus.completed && !t.isOverdue,
+                        )
+                        .length;
+                final overdueCount =
+                    baseFilteredTasks.where((t) => t.isOverdue).length;
+                final completedCount =
+                    baseFilteredTasks
+                        .where((t) => t.status == TaskStatus.completed)
+                        .length;
+
+                final finalTasksToDisplay = applyStatusFilter(
+                  baseFilteredTasks,
+                  state.taskListStatusFilter,
+                );
+
+                _highlightAndScrollToTask(finalTasksToDisplay);
 
                 return CustomScrollView(
                   controller: _scrollController,
                   slivers: [
-                    // Header & Filters
                     SliverToBoxAdapter(
                       child: Padding(
                         padding: const EdgeInsets.all(
@@ -195,7 +214,6 @@ class _TaskListState extends State<TaskList> {
                               theme: theme,
                               allTasks: state.alltasks,
                               onFiltersChanged: (newFilters) {
-                                // Important: Send a specific event for THIS tab's filters
                                 context.read<DashboardBloc>().add(
                                   DashboardUpdateTaskListFiltersEvent(
                                     filters: newFilters,
@@ -207,26 +225,91 @@ class _TaskListState extends State<TaskList> {
                               theme: theme,
                               onPressed: () => _showAddTaskDialog(),
                             ),
+                            const SizedBox(height: 10),
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              physics: const BouncingScrollPhysics(),
+                              child: Row(
+                                children: [
+                                  StatusPill(
+                                    label: 'All Tasks',
+                                    count: allCount,
+                                    isSelected:
+                                        state.taskListStatusFilter ==
+                                        TaskListStatusFilter.all,
+                                    theme: theme,
+                                    onTap:
+                                        () => context.read<DashboardBloc>().add(
+                                          const DashboardUpdateTaskListStatusFilterEvent(
+                                            TaskListStatusFilter.all,
+                                          ),
+                                        ),
+                                  ),
+                                  StatusPill(
+                                    label: 'Ongoing',
+                                    count: todoCount,
+                                    isSelected:
+                                        state.taskListStatusFilter ==
+                                        TaskListStatusFilter.todo,
+                                    theme: theme,
+                                    onTap:
+                                        () => context.read<DashboardBloc>().add(
+                                          const DashboardUpdateTaskListStatusFilterEvent(
+                                            TaskListStatusFilter.todo,
+                                          ),
+                                        ),
+                                  ),
+                                  StatusPill(
+                                    label: 'Overdue',
+                                    count: overdueCount,
+                                    isSelected:
+                                        state.taskListStatusFilter ==
+                                        TaskListStatusFilter.overdue,
+                                    theme: theme,
+                                    onTap:
+                                        () => context.read<DashboardBloc>().add(
+                                          const DashboardUpdateTaskListStatusFilterEvent(
+                                            TaskListStatusFilter.overdue,
+                                          ),
+                                        ),
+                                  ),
+                                  StatusPill(
+                                    label: 'Completed',
+                                    count: completedCount,
+                                    isSelected:
+                                        state.taskListStatusFilter ==
+                                        TaskListStatusFilter.completed,
+                                    theme: theme,
+                                    onTap:
+                                        () => context.read<DashboardBloc>().add(
+                                          const DashboardUpdateTaskListStatusFilterEvent(
+                                            TaskListStatusFilter.completed,
+                                          ),
+                                        ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
                       ),
                     ),
 
-                    // The Task List
                     SliverPadding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 7,
                       ).copyWith(bottom: 20),
                       sliver:
-                          filteredTasks.isEmpty
+                          finalTasksToDisplay.isEmpty
                               ? const SliverToBoxAdapter(child: EmptyTasks())
                               : ListViewObserver(
                                 controller: _observerController,
                                 child: SliverList.builder(
-                                  itemCount: filteredTasks.length,
+                                  itemCount: finalTasksToDisplay.length,
                                   itemBuilder: (context, index) {
-                                    final task = filteredTasks[index];
+                                    final task = finalTasksToDisplay[index];
                                     return TaskCard(
+                                      // ... Your existing TaskCard configuration ...
                                       grid: grid,
                                       key: ValueKey('task_${task.id}'),
                                       task: task,
@@ -267,7 +350,6 @@ class _TaskListState extends State<TaskList> {
           ),
         ),
 
-        // 3. Floating Confetti Layer
         Align(
           alignment: Alignment.topCenter,
           child: ConfettiWidget(
