@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/routing/app_router.dart';
-import '../../../widgets/common/appBar/home_appbar.dart';
+import '../../../widgets/appBar/home_appbar.dart';
 import '../widgets/home_hero.dart';
 import '../widgets/home_minimal.dart';
 

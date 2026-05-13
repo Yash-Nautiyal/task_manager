@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_pallete.dart';
+import '../../core/theme/app_pallete.dart';
 
 class SlideDialog extends StatefulWidget {
   final ThemeData theme;

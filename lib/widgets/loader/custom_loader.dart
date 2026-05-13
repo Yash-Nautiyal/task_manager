@@ -27,7 +27,7 @@ class _CustomLoaderState extends State<CustomLoader>
   late AnimationController _dimmingController;
   late Animation<double> _outerAnimation;
   late Animation<double> _innerAnimation;
-  late Animation<double> _dimmingAnimation;
+  // late Animation<double> _dimmingAnimation;
 
   @override
   void initState() {
@@ -58,9 +58,9 @@ class _CustomLoaderState extends State<CustomLoader>
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
-    _dimmingAnimation = Tween<double>(begin: 0.3, end: 1.0).animate(
-      CurvedAnimation(parent: _dimmingController, curve: Curves.easeInOut),
-    );
+    // _dimmingAnimation = Tween<double>(begin: 0.3, end: 1.0).animate(
+    //   CurvedAnimation(parent: _dimmingController, curve: Curves.easeInOut),
+    // );
 
     // Start all animations
     _outerController.repeat();

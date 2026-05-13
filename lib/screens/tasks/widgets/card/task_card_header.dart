@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:task_app/core/constants/app_icons.dart';
 import 'package:task_app/core/theme/app_pallete.dart';
 import 'package:task_app/models/task_model.dart';
-import 'package:task_app/widgets/common/popup/popup.dart';
-import 'package:task_app/widgets/common/popup/responsive_popup.dart';
-import 'package:task_app/widgets/common/popup/responsive_popup_item.dart';
+import 'package:task_app/widgets/popup/popup.dart';
+import 'package:task_app/widgets/popup/responsive_popup.dart';
+import 'package:task_app/widgets/popup/responsive_popup_item.dart';
 
 class TaskCardHeader extends StatelessWidget {
   final TaskStatus status;

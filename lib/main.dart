@@ -7,7 +7,7 @@ import 'package:task_app/firebase_options.dart';
 import 'package:task_app/screens/auth/bloc/auth_bloc.dart';
 import 'package:task_app/screens/root/root_screen.dart';
 import 'package:task_app/services/auth_service.dart';
-import 'package:task_app/widgets/common/loader/custom_loader.dart';
+import 'package:task_app/widgets/loader/custom_loader.dart';
 
 import 'core/routing/app_router.dart';
 import 'core/theme/app_theme.dart';

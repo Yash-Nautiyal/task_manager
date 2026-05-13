@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../widgets/common/appBar/home_appbar.dart';
+import '../../../widgets/appBar/home_appbar.dart';
 import '../bloc/auth_bloc.dart';
 import '../widgets/signin_page.dart';
 

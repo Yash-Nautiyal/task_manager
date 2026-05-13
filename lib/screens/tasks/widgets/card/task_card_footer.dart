@@ -111,8 +111,7 @@ class _DueDateBadge extends StatelessWidget {
         children: [
           SvgPicture.asset(
             AppIcons.calendarIcon,
-            width: 13,
-            height: 13,
+            width: 20,
             colorFilter: ColorFilter.mode(labelColor, BlendMode.srcIn),
           ),
           const SizedBox(width: 5),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:task_app/core/constants/app_icons.dart';
-import 'package:task_app/widgets/common/popup/responsive_popup.dart';
+import 'package:task_app/widgets/popup/responsive_popup.dart';
 
 import '../divider/custom_divider.dart';
 

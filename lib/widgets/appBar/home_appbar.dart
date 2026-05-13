@@ -8,7 +8,7 @@ import 'package:task_app/core/routing/app_router.dart';
 import 'package:task_app/core/theme/bloc/theme_bloc.dart';
 import 'package:task_app/screens/auth/bloc/auth_bloc.dart';
 
-import '../../../core/constants/app_icons.dart';
+import '../../core/constants/app_icons.dart';
 
 class HomeAppBar extends StatefulWidget implements PreferredSizeWidget {
   final ThemeData theme;

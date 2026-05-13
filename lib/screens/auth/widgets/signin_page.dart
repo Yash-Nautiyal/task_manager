@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_app/core/routing/app_router.dart';
-import 'package:task_app/widgets/common/dialog/snackbar_dialog.dart';
-import '../../../widgets/common/button/custom_textbutton.dart';
-import '../../../widgets/common/inputField/custom_textfield.dart';
+import 'package:task_app/widgets/dialog/snackbar_dialog.dart';
+import '../../../widgets/button/custom_textbutton.dart';
+import '../../../widgets/inputField/custom_textfield.dart';
 import '../bloc/auth_bloc.dart';
 
 class AuthPage extends StatefulWidget {

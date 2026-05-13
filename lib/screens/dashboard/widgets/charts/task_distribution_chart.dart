@@ -4,7 +4,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:task_app/core/theme/app_pallete.dart';
 
 import 'package:task_app/models/task_model.dart';
-import 'package:task_app/widgets/common/button/animated_toggle_button.dart';
+import 'package:task_app/widgets/button/animated_toggle_button.dart';
 import 'calendar_distribution.dart';
 
 class ChartData {

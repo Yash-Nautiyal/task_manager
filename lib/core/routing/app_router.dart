@@ -4,8 +4,8 @@ import 'package:task_app/screens/auth/widgets/signup_page.dart';
 import 'package:task_app/screens/home/pages/home_view.dart';
 import 'package:task_app/screens/root/root_screen.dart';
 import 'package:task_app/services/auth_service.dart';
-import 'package:task_app/widgets/common/header/profile.dart';
-import 'package:task_app/widgets/common/header/settings/settings.dart';
+import 'package:task_app/widgets/header/profile.dart';
+import 'package:task_app/widgets/header/settings/settings.dart';
 
 import 'app_routes.dart';
 

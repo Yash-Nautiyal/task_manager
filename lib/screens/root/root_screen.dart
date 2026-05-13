@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_app/screens/auth/bloc/auth_bloc.dart';
 
-import '../../widgets/common/appBar/home_appbar.dart';
-import '../../widgets/common/dialog/snackbar_dialog.dart';
+import '../../widgets/appBar/home_appbar.dart';
+import '../../widgets/dialog/snackbar_dialog.dart';
 import '../dashboard/bloc/dashboard_bloc.dart';
 import '../dashboard/pages/dashboard_view.dart';
 import '../tasks/pages/task_list.dart';

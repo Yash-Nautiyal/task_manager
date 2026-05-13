@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_app/core/routing/app_routes.dart';
 import 'package:task_app/screens/auth/bloc/auth_bloc.dart';
 import 'package:task_app/services/auth_service.dart';
-import 'package:task_app/widgets/common/button/custom_textbutton.dart';
+import 'package:task_app/widgets/button/custom_textbutton.dart';
 
 import '../dialog/slide_dialog.dart';
 

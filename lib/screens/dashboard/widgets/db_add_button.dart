@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:task_app/core/theme/app_pallete.dart';
-import 'package:task_app/widgets/common/button/custom_textbutton.dart';
+import 'package:task_app/widgets/button/custom_textbutton.dart';
 
 class DbAddButton extends StatelessWidget {
   final ThemeData theme;

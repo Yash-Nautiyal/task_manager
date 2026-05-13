@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:task_app/models/task_model.dart';
-import 'package:task_app/widgets/common/inputField/custom_textfield.dart';
+import 'package:task_app/widgets/inputField/custom_textfield.dart';
 
 import '../../../../core/constants/app_icons.dart';
 import 'footer_buttons.dart';

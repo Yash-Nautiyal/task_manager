@@ -6,7 +6,7 @@ import 'package:task_app/models/task_model.dart';
 import 'package:task_app/screens/dashboard/widgets/dialogs/delete_dialog.dart';
 import 'package:task_app/screens/tasks/widgets/card/task_card_footer.dart';
 import 'package:task_app/screens/tasks/widgets/card/task_card_header.dart';
-import 'package:task_app/widgets/common/popup/responsive_popup.dart';
+import 'package:task_app/widgets/popup/responsive_popup.dart';
 
 class TaskCard extends StatefulWidget {
   final Task task;
